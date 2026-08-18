@@ -1,5 +1,9 @@
 # Entrega 01 — El viaje de una petición
 
+## Objetivo
+
+Comprender qué ocurre detrás de una aplicación web cuando un usuario realiza una acción: desde el clic en el navegador hasta la respuesta del servidor. Construir un primer servidor HTTP con Node.js usando el módulo nativo `http`, implementando rutas, respuesta con estado adecuado y logs básicos.
+
 ## Instrucciones para ejecutar
 
 1. Asegúrate de tener Node.js instalado. Verifica con:
@@ -160,3 +164,13 @@ Podría crear un servidor que simule una tarea lenta (usando `setTimeout` con va
 - **¿Qué sugerencia aceptaste?** La estructura de los apartados del README y la forma de documentar la falla con sus siete campos.
 - **¿Qué sugerencia rechazaste o modificaste?** Modifiqué las respuestas del ticket de salida con mis propias palabras, basándome en lo que entendí de la clase. No copié las respuestas sugeridas por la IA.
 - **¿Cómo comprobaste el resultado?** Ejecuté el servidor con `node server.js` y probé cada ruta en el navegador, verificando que las respuestas fueran las esperadas y que los logs aparecieran correctamente en la terminal.
+
+---
+
+## Reflexión
+
+Lo más valioso de esta clase fue entender que un servidor no es una máquina especial, sino simplemente un programa que se queda activo esperando peticiones. Antes pensaba que "backend" era algo abstracto, pero ahora veo que es código JavaScript corriendo en otro lugar, tomando decisiones basado en lo que le llega.
+
+El laboratorio de fallas fue lo que más me ayudó a internalizar el método de diagnóstico: observar primero, hipotetizar después, y nunca cambiar más de una cosa a la vez. Ver que el mismo síntoma (el navegador no carga) podía tener causas completamente distintas me hizo entender por qué importa mirar la terminal antes de tocar el código.
+
+También aprendí que la diferencia entre frontend y backend no es tecnológica sino de responsabilidad: lo que ejecuta el navegador no es confiable porque el usuario puede modificarlo, mientras que las reglas del servidor sí se pueden confiar porque el usuario no tiene acceso a ellas.
