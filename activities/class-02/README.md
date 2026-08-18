@@ -9,11 +9,15 @@ Comprender HTTP como contrato entre cliente y servidor: métodos, rutas, paráme
 ```
 activities/class-02/
 ├── README.md
-├── request-api-lite/
+├── comparison.md
+├── ai-usage.md
+├── (Actividad 1) request-api-lite/
 │   ├── server.js          (API Lite corregida)
+│   ├── lite-analysis.md
 │   ├── package.json
 │   └── package-lock.json
-├── request-api-full-template/
+├── (Actividad 2) request-api-full/
+│   ├── README.md
 │   ├── docs/
 │   │   └── http-contract.md
 │   ├── src/
@@ -25,8 +29,9 @@ activities/class-02/
 │   │       └── requests.js
 │   ├── package.json
 │   └── package-lock.json
-├── lite-analysis.md
-└── .gitignore
+└── activity resources/
+    ├── request-api-lite/     (API Lite original, sin corregir)
+    └── request-api-full-template/  (Template para el Full)
 ```
 
 ## Cómo ejecutar
@@ -34,7 +39,7 @@ activities/class-02/
 ### API Lite (corregida)
 
 ```bash
-cd request-api-lite
+cd "(Actividad 1) request-api-lite"
 npm install
 npm start
 ```
@@ -44,7 +49,7 @@ El servidor arranca en `http://localhost:3000`.
 ### API Full
 
 ```bash
-cd request-api-full-template
+cd "(Actividad 2) request-api-full"
 npm install
 npm start
 ```
