@@ -20,7 +20,7 @@ activities/class-03/
 └── reflection.md            (fase 5 · reflexión)
 ```
 
-El proyecto transversal actualizado vive en `project/` en la raíz del repositorio.
+El proyecto transversal de esta entrega vive en `activities/class-03/project/`.
 
 ## Fases
 

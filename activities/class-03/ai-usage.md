@@ -47,8 +47,8 @@ Después de la marca de diseño:
   `medium` como prioridad por defecto.
 * Que el guardián de estados terminales proteja **cualquier** campo en `PATCH`, no solo
   `status` (por eso `PATCH` de prioridad sobre una cerrada da `409`, como pide la matriz).
-* Que el contrato del proyecto (`project/docs/http-contract.md`) sea el mismo documento de
-  diseño aprobado, sin modificarlo.
+* Que el contrato del proyecto (`activities/class-03/project/docs/http-contract.md`) sea el
+  mismo documento de diseño aprobado, sin modificarlo.
 
 ## What I rejected or changed
 
