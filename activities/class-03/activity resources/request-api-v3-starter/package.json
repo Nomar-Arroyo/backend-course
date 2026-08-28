@@ -1,0 +1,14 @@
+{
+  "name": "request-api",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Request API as delivered in class 02, starting point for class 03",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
