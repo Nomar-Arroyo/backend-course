@@ -40,7 +40,7 @@ El proyecto transversal actualizado vive en `project/` en la raíz del repositor
 | Fase | Estado |
 | ---- | ------ |
 | 1 · Diseño sin IA | ✅ Documentos completos |
-| 2 · Implementación | ⏳ Pendiente |
-| 3 · IA con contrato | ⏳ Pendiente |
-| 4 · Decisión | ⏳ Pendiente |
-| 5 · Evidencia y reflexión | ⏳ Pendiente |
+| 2 · Implementación | ✅ Commits progresivos + verificación curl |
+| 3 · IA con contrato | ✅ `ai-usage.md` |
+| 4 · Decisión | ✅ `001-cancel-instead-of-delete.md` |
+| 5 · Evidencia y reflexión | ✅ Matriz observada + `reflection.md` |
