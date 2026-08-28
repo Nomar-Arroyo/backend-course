@@ -12,9 +12,32 @@ function sendError(res, status, code, message) {
   return res.status(status).json({ error: { code, message } });
 }
 
-// GET /requests — List all requests
+// GET /requests — List all requests, optionally filtered by status and priority
 router.get('/', (req, res) => {
-  res.status(200).json(requests);
+  const { status, priority } = req.query;
+
+  // A filter with an unknown value is a client mistake: 400 (vs 200 [] which
+  // means "valid filter, no matches"). "There are none" is not "this query
+  // means nothing".
+  if (status !== undefined && !isValidStatus(status)) {
+    return sendError(res, 400, 'INVALID_STATUS', `"${status}" is not a valid status filter`);
+  }
+
+  if (priority !== undefined && !isValidPriority(priority)) {
+    return sendError(res, 400, 'INVALID_PRIORITY', `"${priority}" is not a valid priority filter`);
+  }
+
+  let result = requests;
+
+  if (status !== undefined) {
+    result = result.filter((item) => item.status === status);
+  }
+
+  if (priority !== undefined) {
+    result = result.filter((item) => item.priority === priority);
+  }
+
+  res.status(200).json(result);
 });
 
 // GET /requests/:id — Get a single request by id
