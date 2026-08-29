@@ -1,4 +1,4 @@
-# backend-course
+# Backend-Course
 
 Repositorio único de la materia **Desarrollo Backend** (ITSU) — tercer trimestre.
 
