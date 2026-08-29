@@ -2,7 +2,7 @@
 
 Repositorio único de la materia **Desarrollo Backend** (ITSU) — tercer trimestre.
 
-**Estudiante:** Nomar Arroyo
+**Estudiante:** Nomar Arroyo · `nomar.arroyo.itsu@gmail.com`
 
 Aquí vive el progreso real del trimestre: cada actividad semanal en `activities/class-NN/`
 y el proyecto transversal que crece clase a clase. Nada se sube al final; una entrega que
