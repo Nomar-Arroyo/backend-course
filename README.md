@@ -4,9 +4,8 @@ Repositorio único de la materia **Desarrollo Backend** (ITSU) — tercer trimes
 
 **Estudiante:** Nomar Arroyo · `nomar.arroyo.itsu@gmail.com`
 
-Aquí vive el progreso real del trimestre: cada actividad semanal en `activities/class-NN/`
-y el proyecto transversal que crece clase a clase. Nada se sube al final; una entrega que
-solo existe en local no está entregada.
+Aquí vive el progreso real del trimestre: cada actividad semanal en `activities/class-NN/`.
+Nada se sube al final; una entrega que solo existe en local no está entregada.
 
 ## Descripción
 
@@ -24,35 +23,7 @@ evidencia reproducible, explicación conceptual, sección `AI usage` y reflexió
 | ----- | ------- | ------------------- | --- |
 | [01](activities/class-01/) | El viaje de una petición | Primer servidor HTTP con el módulo nativo de Node.js, ciclo petición–respuesta, falla diagnosticada | `class-01-submission` |
 | [02](activities/class-02/) | HTTP como contrato | Análisis y corrección de la API Lite; construcción de la API Full con contrato HTTP | `class-02-lite-analysis` · `class-02-submission` |
-| [03](activities/class-03/) | Recursos, estado y reglas | Diseño previo sin IA, máquina de estados, `PATCH`, filtros y errores unificados en el proyecto transversal | `class-03-design` · `class-03-submission` |
-
-## Proyecto transversal
-
-**Sistema de gestión de solicitudes** — un solo sistema que incorpora capacidades clase a
-clase. En la entrega 03 vive en `activities/class-03/project/` (API con modelo de recurso,
-contrato HTTP, 5 estados protegidos por máquina de estados, `PATCH` con `409`, filtros y
-formato de error `{ error: { code, message } }`).
-
-```txt
-activities/class-03/project/
-├── README.md
-├── package.json
-├── docs/
-│   ├── http-contract.md
-│   └── decisions/
-│       └── 001-cancel-instead-of-delete.md
-└── src/
-    ├── app.js
-    ├── server.js
-    └── modules/
-        └── requests/
-            ├── requests.routes.js
-            ├── requests.store.js
-            └── request-status.js
-```
-
-> Cuando el proyecto final lo requiera, esta implementación migra a `project/` en la raíz
-> y sigue creciendo (persistencia, validación, seguridad, pruebas, despliegue).
+| [03](activities/class-03/) | Recursos, estado y reglas | Diseño previo sin IA, máquina de estados, `PATCH`, filtros y errores unificados | `class-03-design` · `class-03-submission` |
 
 ## Instrucciones de ejecución
 
@@ -86,7 +57,7 @@ npm start
 
 Rutas: `GET /requests`, `GET /requests/:id`, `POST /requests`.
 
-### Clase 3 — proyecto transversal (solicitudes)
+### Clase 3 — API de solicitudes
 
 ```bash
 cd activities/class-03/project
