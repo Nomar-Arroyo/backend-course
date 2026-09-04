@@ -1,9 +1,13 @@
 # Dependencies are installed locally; they must never be committed.
 node_modules/
 
+# Local environment secrets (database connection string, passwords). Never committed.
+.env
+
 # Teacher's reference solution: shared after the submission deadline.
 # Keeping it out of the public repository.
 activities/class-03/activity resources/request-api-v3-solucion/
+activities/class-04/activity resources/request-api-v4-solucion/
 
 # Extra scaffold template downloaded from the presentation (has node_modules).
 activities/class-03/request-api-expanded-template/
