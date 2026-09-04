@@ -8,7 +8,7 @@
 
 export function mapRequestRow(row) {
   return {
-    id: row.id,
+    id: Number(row.id),
     title: row.title,
     description: row.description ?? '',
     priority: row.priority,
