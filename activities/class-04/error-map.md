@@ -24,7 +24,7 @@ envía al cliente.
 
 | Categoría | Significado | HTTP | Ejemplos de `code` |
 | --------- | ----------- | ---- | ------------------ |
-| `contract` | La petición no tiene la forma esperada (validación de entrada). Problema del cliente. | `400` | `MISSING_TITLE`, `INVALID_PRIORITY`, `INVALID_STATUS`, `NO_UPDATABLE_FIELDS` |
+| `contract` | La petición no tiene la forma esperada (validación de entrada). Problema del cliente. | `400` | `MISSING_TITLE`, `INVALID_PRIORITY`, `INVALID_STATUS`, `EMPTY_PATCH` |
 | `resource` | El recurso pedido no existe. | `404` | `REQUEST_NOT_FOUND` |
 | `domain` | La petición está bien formada pero viola una regla de negocio (depende del estado actual). | `409` | `INVALID_STATUS_TRANSITION`, `REQUEST_IN_TERMINAL_STATUS` |
 | `persistence` | Problema al leer/escribir en la base (conexión, query) **controlado**. | `500` | `DB_ERROR` |
@@ -46,7 +46,7 @@ envía al cliente.
 | `MISSING_TITLE` | contract → `400` |
 | `INVALID_PRIORITY` | contract → `400` |
 | `INVALID_STATUS` | contract → `400` |
-| `NO_UPDATABLE_FIELDS` | contract → `400` |
+| `EMPTY_PATCH` | contract → `400` |
 | `REQUEST_NOT_FOUND` | resource → `404` |
 | `INVALID_STATUS_TRANSITION` | domain → `409` |
 | `REQUEST_IN_TERMINAL_STATUS` | domain → `409` |
