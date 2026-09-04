@@ -24,6 +24,7 @@ evidencia reproducible, explicación conceptual, sección `AI usage` y reflexió
 | [01](activities/class-01/) | El viaje de una petición | Primer servidor HTTP con el módulo nativo de Node.js, ciclo petición–respuesta, falla diagnosticada | `class-01-submission` |
 | [02](activities/class-02/) | HTTP como contrato | Análisis y corrección de la API Lite; construcción de la API Full con contrato HTTP | `class-02-lite-analysis` · `class-02-submission` |
 | [03](activities/class-03/) | Recursos, estado y reglas | Diseño previo sin IA, máquina de estados, `PATCH`, filtros y errores unificados | `class-03-design` · `class-03-submission` |
+| [04](activities/class-04/) | De SQL al backend persistente | PostgreSQL (Supabase), historial de estados, transacciones con rollback, errores sin secretos | `class-04-design` · `class-04-submission` |
 
 ## Instrucciones de ejecución
 
@@ -69,6 +70,25 @@ Rutas: `GET /requests` (con filtros `status` y `priority`), `GET /requests/:id`,
 `POST /requests`, `PATCH /requests/:id`. Los detalles están en
 `docs/http-contract.md` y la verificación en `activities/class-03/test-matrix.md`.
 
+### Clase 4 — API de solicitudes con PostgreSQL
+
+Requiere una base en Supabase. Pasos:
+
+```bash
+cd activities/class-04/project
+npm install
+copy .env.example .env   # pegar el DATABASE_URL (Session pooler)
+npm run db:check         # verifica conexión sin imprimir secretos
+npm start
+```
+
+Las migraciones (`database/migrations/001` y `002`) y el seed (`database/seed.sql`) se
+ejecutan primero en el SQL Editor de Supabase.
+
+Rutas: `GET /requests` (con filtros `status` y `priority`), `GET /requests/:id`,
+`GET /requests/:id/history`, `POST /requests`, `PATCH /requests/:id`. Detalles en
+`project/docs/http-contract.md` y la verificación en `activities/class-04/test-matrix.md`.
+
 ## Estado de las entregas
 
 | Entrega | Estatus | Observaciones |
@@ -76,6 +96,7 @@ Rutas: `GET /requests` (con filtros `status` y `priority`), `GET /requests/:id`,
 | 01 · El viaje de una petición | ✅ Entregada en tiempo | Tag `class-01-submission` |
 | 02 · HTTP como contrato | ✅ Entregada en tiempo | Tags `class-02-lite-analysis` y `class-02-submission` |
 | 03 · Recursos, estado y reglas | ✅ Entregada en tiempo | Tags `class-03-design` (marca de diseño) y `class-03-submission`; matriz verificada con `curl` |
+| 04 · De SQL al backend persistente | ✅ Entregada en tiempo | Tags `class-04-design` (marca de diseño) y `class-04-submission`; PostgreSQL en Supabase, matriz de 12 casos verificada con `curl` (persistencia y rollback) |
 
 ## Reglas del curso que se respetan aquí
 

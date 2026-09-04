@@ -75,9 +75,19 @@ Después de la marca de diseño:
 
 ## How I verified the result
 
-Pendiente de completar en la fase de evidencia: `npm run db:check` contra Supabase,
-migraciones 001 y 002, seed, y los 12 casos de la matriz con `curl -i` (incluyendo
-persistencia tras reinicio y rollback).
+Contra PostgreSQL real (Supabase, `xfywzcdzzcmeqpvwymfw`):
+
+* `npm run db:check` → `✓ Database connection established` · `✓ PostgreSQL version detected`
+  → `database_name: 'postgres'`, `version: 'PostgreSQL 17.6 ...'` (sin imprimir secretos).
+* Migraciones `001` y `002` aplicadas; tablas `requests` y `request_status_history`
+  creadas; `seed.sql` poblado (3 requests + 4 eventos de historial).
+* Los 12 casos de la matriz verificados con `curl -i` (persistencia tras reinicio,
+  `409`, `400`, `404`, `503 DATABASE_UNAVAILABLE`, historial cronológico).
+* Rollback verificado con la unidad de trabajo del proyecto: `withTransaction` +
+  `insertRequest` + `insertStatusHistory` fallando (`code=23514`) → `ROLLBACK` → la
+  solicitud no quedó creada (requests antes=0, después=0).
+* Se corrigió un desvío de contrato detectado en la verificación: `BIGINT` llega como
+  string desde `pg`; el mapper ahora devuelve `id` como `Number` (como promete el contrato).
 
 ## What I still do not understand
 

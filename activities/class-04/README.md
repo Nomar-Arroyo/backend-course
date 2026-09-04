@@ -50,9 +50,9 @@ El proyecto de esta entrega vive en `activities/class-04/project/`. La base de r
 
 | Fase | Estado |
 | ---- | ------ |
-| 1 · Diseño sin IA | 🔨 Documentos en construcción |
-| 2 · Configuración de la base | Pendiente |
-| 3 · Implementación | Pendiente |
-| 4 · IA con contrato | Pendiente |
-| 5 · Decisión | Pendiente |
-| 6 · Evidencia y reflexión | Pendiente |
+| 1 · Diseño sin IA | ✅ Commit + tag `class-04-design` |
+| 2 · Configuración de la base | ✅ Supabase `xfywzcdzzcmeqpvwymfw`, Session pooler, `npm run db:check` OK, migraciones + seed |
+| 3 · Implementación | ✅ Commits progresivos + fix contrato `id` numérico |
+| 4 · IA con contrato | ✅ `ai-usage.md` |
+| 5 · Decisión | ✅ `002-preserve-status-history.md` |
+| 6 · Evidencia y reflexión | ✅ Matriz (12 casos) observada + `reflection.md` |

@@ -1,76 +1,81 @@
 # Test matrix — Entrega 04 (12 casos mínimos)
 
-> Fase 1: se declara el resultado **esperado**. Fase 6: se ejecuta cada caso y se registra
-> el resultado **observado** (línea de estado literal, `HTTP/1.1 ...`), con evidencia que
-> demuestre persistencia y rollback. Los observados se llenan ejecutando, no copiando.
+> Fase 1: se declaró el resultado **esperado**. Fase 6: se ejecutó cada caso contra
+> PostgreSQL (Supabase) y se registró el resultado **observado** (línea de estado literal
+> `HTTP/1.1 ...`). La evidencia confirma persistencia tras reinicio y rollback.
 
 ## Datos semilla
 
-La base se puebla con `database/seed.sql`: tres solicitudes con sus eventos de nacimiento
-y una transición (`open → in_progress` en el id que corresponda) para que los casos tengan
-historia que consultar.
+La base se pobló con `database/seed.sql`: tres solicitudes con su evento de nacimiento y
+una transición (`open → in_progress`). Los ids los asigna PostgreSQL (`IDENTITY`), por lo
+que en ejecución dependen del estado de la base; la referencia es la solicitud creada en el
+caso 2 (id `5`).
 
 | id | title | status | priority |
 | -- | ----- | ------ | -------- |
 | 1 | Projector does not turn on | `open` | `high` |
 | 2 | Broken chair in the lab | `in_progress` | `medium` |
 | 3 | Wi-Fi drops in the library | `open` | `low` |
+| 5 | Evidence request (caso 2) | `open` → `in_progress` (caso 10) | `high` |
 
-> Los ids los asigna PostgreSQL (`IDENTITY`), por lo que en ejecución pueden variar según el
-> estado de la base; se usa el id de la solicitud recién creada como referencia.
+## Resultados observados
 
-## Casos (8 de la clase + 4 propios)
+| # | Caso | Petición / acción | Resultado observado |
+| - | ----- | ----------------- | ------------------- |
+| 1 | Conectar correctamente | `npm run db:check` | `✓ Environment variable found`, `✓ Database connection established`, `✓ PostgreSQL version detected` → `{ database_name: 'postgres', postgres_version: 'PostgreSQL 17.6 ...' }` |
+| 2 | Crear solicitud | `POST /requests` | `HTTP/1.1 201 Created` — `{"id":5,"title":"Evidence request","description":"...","priority":"high","status":"open","createdAt":"2026-09-04T17:39:42.774Z","updatedAt":"..."}` |
+| 3 | Persistencia tras reinicio | Reiniciar Express → `GET /requests/5` | `HTTP/1.1 200 OK` — mismos `id`, `title`, `priority`, `createdAt` tras el reinicio |
+| 4 | Filtrar sin resultados | `GET /requests?status=closed&priority=high` | `HTTP/1.1 200 OK` — `[]` |
+| 5 | Transición inválida | `PATCH /requests/5` `{"status":"closed"}` | `HTTP/1.1 409 Conflict` — `{"error":{"code":"INVALID_STATUS_TRANSITION","message":"Cannot move a request from open to closed"}}` |
+| 6 | Consultar historial | `GET /requests/5/history` | `HTTP/1.1 200 OK` — 2 eventos en orden cronológico (ver caso 10) |
+| 7 | Falla del historial (rollback) | Unidad de trabajo con `insertStatusHistory` fallando | `INSERT request OK, id=7` → `Failed inside withTransaction: code=23514` → `requests after failed unit (ROLLBACK): 0` → la solicitud NO quedó creada (rollback verificado) |
+| 8 | Base no disponible | Conexión al pool con host/credencial inalcanzable | `HTTP/1.1 503 Service Unavailable` — `{"error":{"code":"DATABASE_UNAVAILABLE","message":"The database is currently unavailable. Please try again later."}}` (sin secretos) |
+| 9 | Crear sin título | `POST /requests` `{"description":"no title"}` | `HTTP/1.1 400 Bad Request` — `{"error":{"code":"MISSING_TITLE","message":"Title is required"}}` |
+| 10 | PATCH registra evento en historial | `PATCH /requests/5` `{"status":"in_progress"}` | `HTTP/1.1 200 OK` — `{"id":5, ...,"status":"in_progress", ...}`. Historial: `[{"previousStatus":null,"newStatus":"open",...},{"previousStatus":"open","newStatus":"in_progress",...}]` |
+| 11 | Historial de solicitud inexistente | `GET /requests/999/history` | `HTTP/1.1 404 Not Found` — `{"error":{"code":"REQUEST_NOT_FOUND","message":"Request 999 was not found"}}` |
+| 12 | Filtro con valor desconocido | `GET /requests?status=abierta` | `HTTP/1.1 400 Bad Request` — `{"error":{"code":"INVALID_STATUS","message":"\"abierta\" is not a valid status filter"}}` |
 
-| # | Caso | Estado previo | Petición / acción | Resultado esperado | Resultado observado |
-| - | ----- | ------------- | ----------------- | ------------------ | ------------------- |
-| 1 | Conectar correctamente | Proyecto activo | `npm run db:check` | Éxito: conexión establecida, sin secretos | |
-| 2 | Crear solicitud | — | `POST /requests` | `201 Created`, `status=open`, `priority=medium`, fechas de la base | |
-| 3 | Persistencia tras reinicio | Solicitud creada | Reiniciar Express → `GET /requests/:id` | `200 OK` con los **mismos** datos | |
-| 4 | Filtrar sin resultados | — | `GET /requests?status=closed&priority=high` | `200 OK []` | |
-| 5 | Transición inválida | `open` | `PATCH /requests/{id}` `{"status":"closed"}` | `409 INVALID_STATUS_TRANSITION` | |
-| 6 | Consultar historial | Tras una transición | `GET /requests/{id}/history` | `200 OK` con eventos cronológicos | |
-| 7 | Falla del historial (rollback) | Estado previo | Provocar fallo en `insertStatusHistory` dentro de la transacción | Rollback: al consultar, `requests` intacta | |
-| 8 | Base no disponible | Pool caído | Cualquier consulta | Error consistente `503 DATABASE_UNAVAILABLE`, sin secretos | |
-| 9 | Crear sin título | — | `POST /requests` `{"description":"..."}` | `400 MISSING_TITLE` | |
-| 10 | PATCH registra evento en historial | `open` | `PATCH /requests/{id}` `{"status":"in_progress"}` → `GET .../history` | `200` y el historial tiene nacimiento + la nueva transición | |
-| 11 | Historial de solicitud inexistente | — | `GET /requests/999/history` | `404 REQUEST_NOT_FOUND` | |
-| 12 | Filtro con valor desconocido | — | `GET /requests?status=abierta` | `400 INVALID_STATUS` | |
+### Casos propios (justificación)
 
-### Casos propios (min 4) — justificación
-
-* **Caso 9** (`400 MISSING_TITLE`): verifica que la validación de contrato sobrevive al
-  store persistente.
-* **Caso 10** (historial tras PATCH): demuestra que cada transición **escribe** su evento,
-  no solo que se puede leer el seed.
-* **Caso 11** (`404` en history): el endpoint nuevo debe distinguir "sin historial" de
+* **Caso 9** (`400 MISSING_TITLE`): la validación de contrato sobrevive al store persistente.
+* **Caso 10** (historial tras PATCH): cada transición **escribe** su evento, no solo es
+  legible el seed (produce los eventos del caso 6).
+* **Caso 11** (`404` en history): el endpoint nuevo distingue "sin historial" de
   "recurso inexistente".
 * **Caso 12** (`400 INVALID_STATUS` en filtro): mantiene la regla de clase 3 de contrato.
 
-## Evidencia obligatoria (fase 6)
+## Evidencia obligatoria
 
 ### Persistencia: antes / reinicio / después
 
 ```
-POST /requests { "title": "Evidence request" }        → 201 Created, { "id": N }
-# Detener Express (Ctrl+C) y arrrancarlo de nuevo
-GET  /requests/N                                       → 200 OK, mismos datos (id, title, fechas)
+POST /requests { "title": "Evidence request", priority: high }
+HTTP/1.1 201 Created
+{"id":5,"title":"Evidence request", ..., "createdAt":"2026-09-04T17:39:42.774Z","updatedAt":"2026-09-04T17:39:42.774Z"}
+
+# Se detiene Express (Stop-Process node) y se arranca de nuevo
+GET /requests/5
+HTTP/1.1 200 OK
+{"id":5,"title":"Evidence request", ..., "createdAt":"2026-09-04T17:39:42.774Z","updatedAt":"2026-09-04T17:39:42.774Z"}
 ```
 
-La evidencia textual muestra la línea `HTTP/1.1 201` y la posterior `HTTP/1.1 200` con los
-mismos datos.
+Mismos datos antes y después del reinicio: el estado vive en la base, no en el proceso.
 
 ### Rollback
 
 ```
-# Fallo controlado en el segundo INSERT de la transacción (historial)
-PATCH/POST ...                                        → respuesta de error (500/409 según el fallo)
-SELECT id, title, status FROM requests WHERE ...      → la solicitud NO quedó creada (o no cambió)
+# Unidad de trabajo (withTransaction) con insertStatusHistory fallando:
+#   INSERT request OK, id=7
+#   Failed inside withTransaction: code=23514 (new row for relation
+#   "request_status_history" violates check constraint
+#   "request_status_history_new_check")
+#   requests after failed unit (ROLLBACK): 0
 ```
 
-La evidencia textual muestra la respuesta de error y la consulta posterior demostrando que
-`requests` quedó intacta.
+La consulta posterior demuestra que la solicitud NO quedó creada: `requests` quedó intacta.
 
 ## Regla de evidencia sin secretos
 
-Ningún volcado debe incluir la URL `postgresql://...` ni la contraseña. Se muestra: comando
-exitoso, nombre de la base, tablas y resultados de consultas.
+Ningún volcado incluye `DATABASE_URL` ni la contraseña: solo el nombre de la base
+(`postgres`), la versión (`PostgreSQL 17.6`) y resultados de consultas. El `.env` real está
+en `.gitignore` y nunca se commitea (verificado con `git check-ignore`).
