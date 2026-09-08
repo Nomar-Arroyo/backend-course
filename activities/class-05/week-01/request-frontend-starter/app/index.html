@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solicitudes — /app</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <strong>Solicitudes</strong>
+    <div id="session-box" class="session-box">
+      <span id="session-user" class="session-user">Sin sesión</span>
+      <button id="logout-btn" hidden type="button">Salir</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section id="auth-panel" class="panel">
+      <h2>Entrar</h2>
+      <form id="login-form" class="stack">
+        <label>Email <input name="email" type="email" required autocomplete="username"></label>
+        <label>Password <input name="password" type="password" required minlength="15" maxlength="128" autocomplete="current-password"></label>
+        <button type="submit">Iniciar sesión</button>
+      </form>
+      <p id="auth-feedback" class="feedback" role="status"></p>
+      <!-- TODO (05A): formulario de registro con sus propios errores visibles. -->
+    </section>
+
+    <section id="requests-panel" class="panel" hidden>
+      <h2>Mis solicitudes</h2>
+      <p id="requests-state" class="feedback" role="status">—</p>
+      <ul id="requests-list" class="request-list"></ul>
+      <!-- TODO (05A): crear, filtrar, detalle, historial, edición condicionada,
+           y la vista de agent (prioridad, transiciones disponibles, conflictos).
+           Cada estado de interfaz (loading/empty/401/403/404/409/500/red) debe
+           verse distinto y decir algo útil. -->
+    </section>
+  </main>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
