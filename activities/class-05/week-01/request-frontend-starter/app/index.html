@@ -3,38 +3,125 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Solicitudes — /app</title>
+  <title>Solicitudes — /app (entrega 05A)</title>
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
   <header class="topbar">
-    <strong>Solicitudes</strong>
-    <div id="session-box" class="session-box">
-      <span id="session-user" class="session-user">Sin sesión</span>
-      <button id="logout-btn" hidden type="button">Salir</button>
+    <strong>Request API · clase 05</strong>
+    <div class="session-box">
+      <span id="session-user" class="muted">Sin sesión</span>
+      <span id="role-badge" class="badge" hidden></span>
+      <button id="logout-btn" type="button" hidden>Salir</button>
     </div>
   </header>
 
-  <main class="layout">
-    <section id="auth-panel" class="panel">
-      <h2>Entrar</h2>
+  <!-- ===================== Vista de autenticación ===================== -->
+  <main id="auth-view" class="layout">
+    <section class="panel">
+      <div class="tabs" role="tablist" aria-label="Autenticación">
+        <button id="tab-login" type="button" class="tab is-active" role="tab">Entrar</button>
+        <button id="tab-register" type="button" class="tab" role="tab">Crear cuenta</button>
+      </div>
+
       <form id="login-form" class="stack">
+        <h2>Iniciar sesión</h2>
         <label>Email <input name="email" type="email" required autocomplete="username"></label>
-        <label>Password <input name="password" type="password" required minlength="15" maxlength="128" autocomplete="current-password"></label>
-        <button type="submit">Iniciar sesión</button>
+        <label>Contraseña
+          <input name="password" type="password" required minlength="15" maxlength="128" autocomplete="current-password">
+        </label>
+        <button type="submit">Entrar</button>
       </form>
-      <p id="auth-feedback" class="feedback" role="status"></p>
-      <!-- TODO (05A): formulario de registro con sus propios errores visibles. -->
+
+      <form id="register-form" class="stack" hidden>
+        <h2>Crear cuenta (requester)</h2>
+        <p class="hint">El registro es libre y siempre crea un rol <code>requester</code>.</p>
+        <label>Email <input name="email" type="email" required autocomplete="username"></label>
+        <label>Contraseña (15 a 128 caracteres)
+          <input name="password" type="password" required minlength="15" maxlength="128" autocomplete="new-password">
+        </label>
+        <button type="submit">Registrarme</button>
+      </form>
+
+      <p id="auth-feedback" class="alert" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <!-- ===================== Vista de la aplicación ===================== -->
+  <main id="app-view" class="layout" hidden>
+    <section class="panel">
+      <div class="toolbar">
+        <div class="filters">
+          <label>Estado
+            <select id="filter-status">
+              <option value="">Todos</option>
+              <option value="open">open</option>
+              <option value="in_progress">in_progress</option>
+              <option value="resolved">resolved</option>
+              <option value="closed">closed</option>
+              <option value="cancelled">cancelled</option>
+            </select>
+          </label>
+          <label>Prioridad
+            <select id="filter-priority">
+              <option value="">Todas</option>
+              <option value="low">low</option>
+              <option value="medium">medium</option>
+              <option value="high">high</option>
+            </select>
+          </label>
+          <button id="apply-filters" type="button">Aplicar</button>
+          <button id="reload-btn" type="button" class="ghost">Refrescar</button>
+        </div>
+        <button id="new-request-btn" type="button" hidden>Nueva solicitud</button>
+      </div>
+      <p id="toolbar-feedback" class="alert" role="status" aria-live="polite"></p>
     </section>
 
-    <section id="requests-panel" class="panel" hidden>
-      <h2>Mis solicitudes</h2>
-      <p id="requests-state" class="feedback" role="status">—</p>
-      <ul id="requests-list" class="request-list"></ul>
-      <!-- TODO (05A): crear, filtrar, detalle, historial, edición condicionada,
-           y la vista de agent (prioridad, transiciones disponibles, conflictos).
-           Cada estado de interfaz (loading/empty/401/403/404/409/500/red) debe
-           verse distinto y decir algo útil. -->
+    <section id="create-form" class="panel" hidden>
+      <form id="create-form-fields" class="stack">
+        <h2>Nueva solicitud</h2>
+        <label>Título *
+          <input name="title" type="text" required maxlength="200" placeholder="¿Qué necesitás?">
+        </label>
+        <label>Descripción
+          <textarea name="description" rows="4" placeholder="Contexto para quien la atiende"></textarea>
+        </label>
+        <label>Prioridad
+          <select name="priority">
+            <option value="low">low</option>
+            <option value="medium" selected>medium</option>
+            <option value="high">high</option>
+          </select>
+        </label>
+        <div class="row">
+          <button type="submit">Crear</button>
+          <button id="create-cancel" type="button" class="ghost">Cancelar</button>
+        </div>
+      </form>
+      <p id="create-feedback" class="alert" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2 id="list-title">Solicitudes</h2>
+        <span id="list-count" class="muted"></span>
+      </div>
+      <p id="list-state" class="alert" role="status" aria-live="polite"></p>
+      <ul id="request-list" class="request-list"></ul>
+    </section>
+
+    <section id="detail-panel" class="panel" hidden>
+      <div class="panel-head">
+        <h2 id="detail-title">Detalle</h2>
+        <button id="detail-back" type="button" class="ghost">Volver</button>
+      </div>
+      <dl id="detail-fields" class="detail-fields"></dl>
+      <p id="detail-description" class="description"></p>
+      <div id="detail-actions" class="detail-actions"></div>
+      <p id="detail-feedback" class="alert" role="status" aria-live="polite"></p>
+      <h3 class="history-title">Historial de estados</h3>
+      <ul id="history-list" class="history-list"></ul>
     </section>
   </main>
 
