@@ -1,9 +1,9 @@
 // Application setup: middlewares and module mounting. It does not open any port.
 import express from 'express';
 import { corsPolicy } from './middleware/cors.js';
+import { authenticate } from './middleware/authenticate.js';
 import authRoutes from './modules/auth/auth.routes.js';
 import requestsRoutes from './modules/requests/requests.routes.js';
-// TODO (station 5): import { authenticate } from './middleware/authenticate.js';
 
 const app = express();
 
@@ -17,10 +17,8 @@ app.use(express.json());
 // (/me), so the module applies `authenticate` internally where needed.
 app.use('/auth', authRoutes);
 
-// TODO (station 5): every requests route needs a trusted actor. Protect
-// the module so authenticate runs first and builds req.auth (or answers
-// 401 and the router never runs):
-//   app.use('/requests', authenticate, requestsRoutes);
-app.use('/requests', requestsRoutes);
+// Every requests route needs a trusted actor: authenticate runs first and
+// builds req.auth (or answers 401 and the router never runs).
+app.use('/requests', authenticate, requestsRoutes);
 
 export default app;
