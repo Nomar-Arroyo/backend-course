@@ -19,36 +19,32 @@
 // ============================================================================
 
 export function canListAllRequests(actor) {
-  // TODO (station 7)
-  throw new Error('TODO: canListAllRequests is not implemented yet.');
+  return actor.role === 'agent';
 }
 
 export function canViewRequest(actor, request) {
-  // TODO (station 6/7)
-  throw new Error('TODO: canViewRequest is not implemented yet.');
+  if (actor.role === 'agent') return true;
+  return request.created_by === actor.userId;
 }
 
 export function canViewHistory(actor, request) {
-  // TODO (station 6/7)
-  throw new Error('TODO: canViewHistory is not implemented yet.');
+  return canViewRequest(actor, request);
 }
 
 export function canCreateRequest(actor) {
-  // TODO (station 7)
-  throw new Error('TODO: canCreateRequest is not implemented yet.');
+  return actor.role === 'requester';
 }
 
 export function canEditContent(actor, request) {
-  // TODO (station 7)
-  throw new Error('TODO: canEditContent is not implemented yet.');
+  return actor.role === 'requester'
+    && request.created_by === actor.userId
+    && request.status === 'open';
 }
 
 export function canChangePriority(actor) {
-  // TODO (station 7)
-  throw new Error('TODO: canChangePriority is not implemented yet.');
+  return actor.role === 'agent';
 }
 
 export function canChangeStatus(actor) {
-  // TODO (station 7)
-  throw new Error('TODO: canChangeStatus is not implemented yet.');
+  return actor.role === 'agent';
 }
