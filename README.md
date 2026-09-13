@@ -137,10 +137,10 @@ comparador de mecanismos, quiz, árbol de decisión) y fuentes trazables.
 
 | Entrega | Estatus | Observaciones |
 | ------- | ------- | ------------- |
-| 01 · El viaje de una petición | ✅ Entregada en tiempo | Tag `class-01-submission` |
-| 02 · HTTP como contrato | ✅ Entregada en tiempo | Tags `class-02-lite-analysis` y `class-02-submission` |
-| 03 · Recursos, estado y reglas | ✅ Entregada en tiempo | Tags `class-03-design` (marca de diseño) y `class-03-submission`; matriz verificada con `curl` |
-| 04 · De SQL al backend persistente | ✅ Entregada en tiempo | Tags `class-04-design` (marca de diseño) y `class-04-submission`; PostgreSQL en Supabase, matriz de 12 casos verificada con `curl` (persistencia y rollback) |
+| 01 · El viaje de una petición | ✅ Entregada | Tag `class-01-submission` |
+| 02 · HTTP como contrato | ✅ Entregada | Tags `class-02-lite-analysis` y `class-02-submission` |
+| 03 · Recursos, estado y reglas | ✅ Entregada | Tags `class-03-design` (marca de diseño) y `class-03-submission`; matriz verificada con `curl` |
+| 04 · De SQL al backend persistente | ✅ Entregada | Tags `class-04-design` (marca de diseño) y `class-04-submission`; PostgreSQL en Supabase, matriz de 12 casos verificada con `curl` (persistencia y rollback) |
 | 05A · Interfaz real de solicitudes | ✅ Entregada | Tags `class-05-design` (marca de diseño) y `class-05-submission` (entrega 05B); taller 12/12 (boss battle), frontend `week-01` sobre API real |
 | 05B · El mundo de la autenticación | ✅ Entregada | `week-02/`: 20 contenidos, 4 interacciones significativas, fuentes trazables, todo ficticio |
 
