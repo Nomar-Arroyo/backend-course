@@ -25,6 +25,7 @@ evidencia reproducible, explicación conceptual, sección `AI usage` y reflexió
 | [02](activities/class-02/) | HTTP como contrato | Análisis y corrección de la API Lite; construcción de la API Full con contrato HTTP | `class-02-lite-analysis` · `class-02-submission` |
 | [03](activities/class-03/) | Recursos, estado y reglas | Diseño previo sin IA, máquina de estados, `PATCH`, filtros y errores unificados | `class-03-design` · `class-03-submission` |
 | [04](activities/class-04/) | De SQL al backend persistente | PostgreSQL (Supabase), historial de estados, transacciones con rollback, errores sin secretos | `class-04-design` · `class-04-submission` |
+| [05](activities/class-05/) | Seguridad e identidad + frontend real | Registro, hashing scrypt, login con JWT, middleware `authenticate`, propiedad y permisos (12/12); entregas 05A (interfaz `/app`) y 05B (documentación interactiva `/learn`) | `class-05-design` · `class-05-submission` |
 
 ## Instrucciones de ejecución
 
@@ -89,6 +90,49 @@ Rutas: `GET /requests` (con filtros `status` y `priority`), `GET /requests/:id`,
 `GET /requests/:id/history`, `POST /requests`, `PATCH /requests/:id`. Detalles en
 `project/docs/http-contract.md` y la verificación en `activities/class-04/test-matrix.md`.
 
+### Clase 5 — taller de identidad (backend)
+
+```bash
+cd activities/class-05/taller/project
+npm install
+copy .env.example .env   # DATABASE_URL + JWT_SECRET propios
+npm run validate:class-05 -- --stage setup
+npm start
+```
+
+Registro público, login con JWT y scoping por rol; validación por etapas
+(`register`, `password`, `login`, `authentication`, `ownership`,
+`authorization`) y la prueba reina sin argumentos: `npm run validate:class-05`
+(12/12).
+
+### Clase 5 — entrega 05A (frontend `/app`)
+
+Requisitos: backend clase 5 corriendo en `http://localhost:3000` con
+`FRONTEND_ORIGIN=http://localhost:5173`.
+
+```bash
+cd activities/class-05/week-01/request-frontend-starter
+npm install
+copy .env.example .env   # opcional: VITE_API_URL=http://localhost:3000
+npm run dev              # abrir http://localhost:5173/app/
+```
+
+Rutas del proyecto: `/app` (05A) y `/learn` (plantilla). El token de acceso se
+guarda en `sessionStorage` con su mitigación XSS documentada en
+`app/README.md`; el `dist/` no se commitea.
+
+### Clase 5 — entrega 05B (`/learn` interactivo)
+
+```bash
+cd activities/class-05/week-02
+npm install
+npm run dev              # redirige a http://localhost:5173/learn/
+```
+
+Documentación interactiva (proyecto Vite independiente, justificado en su
+`README.md`): 20 contenidos, 4 interacciones (inspector ficticio de JWT,
+comparador de mecanismos, quiz, árbol de decisión) y fuentes trazables.
+
 ## Estado de las entregas
 
 | Entrega | Estatus | Observaciones |
@@ -97,6 +141,8 @@ Rutas: `GET /requests` (con filtros `status` y `priority`), `GET /requests/:id`,
 | 02 · HTTP como contrato | ✅ Entregada en tiempo | Tags `class-02-lite-analysis` y `class-02-submission` |
 | 03 · Recursos, estado y reglas | ✅ Entregada en tiempo | Tags `class-03-design` (marca de diseño) y `class-03-submission`; matriz verificada con `curl` |
 | 04 · De SQL al backend persistente | ✅ Entregada en tiempo | Tags `class-04-design` (marca de diseño) y `class-04-submission`; PostgreSQL en Supabase, matriz de 12 casos verificada con `curl` (persistencia y rollback) |
+| 05A · Interfaz real de solicitudes | ✅ Entregada | Tags `class-05-design` (marca de diseño) y `class-05-submission` (entrega 05B); taller 12/12 (boss battle), frontend `week-01` sobre API real |
+| 05B · El mundo de la autenticación | ✅ Entregada | `week-02/`: 20 contenidos, 4 interacciones significativas, fuentes trazables, todo ficticio |
 
 ## Reglas del curso que se respetan aquí
 
