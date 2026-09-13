@@ -2,9 +2,6 @@
 
 Dos roles exactos: `requester` y `agent`. Sin `admin`.
 
-Completa cada celda con `Sí`, `No`, `Propias` o `Propia y abierta`.
-La matriz converge en la baseline del taller (Contrato fijo).
-
 | Operación | Anónimo | Requester | Agent |
 | --------- | ------: | --------: | ----: |
 | `POST /auth/register` | Sí | Sí | Sí |

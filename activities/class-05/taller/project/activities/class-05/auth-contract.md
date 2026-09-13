@@ -1,9 +1,5 @@
 # Contrato de autenticación — Request API v5
 
-Documenta ANTES de implementar. Para cada endpoint: método, ruta, ¿público o
-protegido?, body permitido, respuesta de éxito (código + forma) y CADA error
-(código HTTP + `error.code`).
-
 Toda respuesta de error tiene la forma:
 `{ "error": { "code": "<CODE>", "message": "<mensaje>" } }`
 
