@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>El mundo de la autenticación — /learn</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <a class="skip" href="#contenido">Saltar al contenido</a>
+  <header class="hero">
+    <p class="eyebrow">Entrega 05B · activities/class-05/week-02</p>
+    <h1>El mundo de la autenticación</h1>
+    <p class="lead">
+      Una guía interactiva de identidad, autenticación y autorización.
+      Todos los ejemplos son ficticios. Cada afirmación clave está marcada
+      como <span class="badge badge-dato">dato</span>,
+      <span class="badge badge-interp">interpretación</span>,
+      <span class="badge badge-rec">recomendación</span> o
+      <span class="badge badge-decision">decisión mía</span>.
+    </p>
+    <nav class="toc" aria-label="Índice de los 20 contenidos">
+      <ol>
+        <li><a href="#identidad">Identidad digital</a></li>
+        <li><a href="#autenticacion">Autenticación</a></li>
+        <li><a href="#autorizacion">Autorización</a></li>
+        <li><a href="#auditoria">Auditoría</a></li>
+        <li><a href="#passwords">Passwords</a></li>
+        <li><a href="#sesiones">Sesiones</a></li>
+        <li><a href="#cookies">Cookies</a></li>
+        <li><a href="#bearer">Bearer tokens</a></li>
+        <li><a href="#jwt">JWT</a></li>
+        <li><a href="#api-keys">API keys</a></li>
+        <li><a href="#oauth2">OAuth 2</a></li>
+        <li><a href="#oidc">OpenID Connect</a></li>
+        <li><a href="#mfa">MFA</a></li>
+        <li><a href="#passkeys">Passkeys</a></li>
+        <li><a href="#proveedores">Proveedores de identidad</a></li>
+        <li><a href="#propia-vs-gestionada">Propia vs gestionada</a></li>
+        <li><a href="#riesgos">Riesgos comunes</a></li>
+        <li><a href="#casos">Casos de uso</a></li>
+        <li><a href="#arbol">Árbol de decisión</a></li>
+        <li><a href="#fuentes">Fuentes</a></li>
+      </ol>
+    </nav>
+  </header>
+
+  <main id="contenido">
+    <section id="identidad" class="card">
+      <h2><span>1</span> Identidad digital</h2>
+      <p>
+        Una <strong>identidad digital</strong> es el conjunto de atributos que
+        representan a alguien o algo en un sistema. No es la persona: es un
+        modelo de ella con la misma intención que una llave copiada de una
+        puerta original.
+      </p>
+      <ul>
+        <li>Puede ser parcial (solo "cliente", solo "empleado") según contexto.</li>
+        <li>Puede ser anónima, seudónima o vinculada a un usuario real.</li>
+        <li>Se compone de <em>atributos</em> (edad, rol, correo) y de <em>identificadores</em> (email único, ID).</li>
+      </ul>
+      <p>
+        <span class="badge badge-interp">Interpretación</span> En un sistema de
+        solicitudes, la "identidad" que importa es la capacidad de responder:
+        ¿quién pide?, ¿qué puede ver?, ¿qué dejó registrado? La identidad
+        técnica (la base de datos de usuarios) responde eso.
+      </p>
+    </section>
+
+    <section id="autenticacion" class="card">
+      <h2><span>2</span> Autenticación</h2>
+      <p>
+        <strong>Autenticación</strong> responde a <em>¿quién eres?</em>.
+        Autentican: presentar una credencial que vincula la identidad con una
+        prueba (algo que sabes, algo que tienes, algo que eres).
+      </p>
+      <div class="tag-row">
+        <span class="tag">Algo que sabes → password</span>
+        <span class="tag">Algo que tienes → teléfono, llave de seguridad</span>
+        <span class="tag">Algo que eres → huella, rostro</span>
+      </div>
+      <p>
+        Ejemplo ficticio: <code>valentina@demo.local</code> se autentica con un
+        password — y solo el <em>hash</em> de ese password vive en la base de
+        datos, nunca la palabra en claro.
+      </p>
+    </section>
+
+    <section id="autorizacion" class="card">
+      <h2><span>3</span> Autorización</h2>
+      <p>
+        <strong>Autorización</strong> responde a <em>¿qué puedes hacer aquí?</em>
+        y ocurre <em>después</em> de autenticar. Autenticar no autoriza.
+      </p>
+      <p>
+        En el taller 05A la diferencia es central: un requester autenticado solo
+        hace <code>POST /requests</code>, un agent además cambia estados y
+        prioridades. Esa política vive en el backend; ocultar un botón en el
+        frontend NO es autorizar.
+      </p>
+      <p class="callout">
+        <span class="badge badge-dato">Dato</span> Un recurso pertenece a su
+        autor/actor registrado; el sistema responde <code>404</code> ante
+        recursos ajenos para no filtrar su existencia.
+      </p>
+    </section>
+
+    <section id="auditoria" class="card">
+      <h2><span>4</span> Auditoría</h2>
+      <p>
+        <strong>Auditoría</strong> es registrar <em>qué pasó, quién lo hizo y
+        cuándo</em> para poder revisarlo después. No previene, documenta.
+      </p>
+      <p>
+        En el taller, cada cambio de estado de una solicitud crea una fila en
+        el historial con <code>changed_by</code> tomado del token — no del
+        cuerpo de la petición. Eso es auditoría mínima y honesta.
+      </p>
+      <p>
+        <span class="badge badge-interp">Interpretación</span> Una tabla de
+        auditoría solo sirve si nadie puede fingir el actor: por eso
+        <code>changedBy</code> que llega en el body es rechazado
+        (<code>400 SERVER_CONTROLLED_FIELD</code>).
+      </p>
+    </section>
+
+    <section id="passwords" class="card">
+      <h2><span>5</span> Passwords</h2>
+      <p>
+        Punto de partida de casi toda identidad. Una regla técnica: nunca
+        guardar la contraseña en claro; guardar un <em>hash derivado</em> con
+        una función lenta (scrypt, bcrypt, argon2) + sal.
+      </p>
+      <p>
+        En el taller 03 se aprecia que el frontend solo envía el password, el
+        backend hace el hashing y el frontend jamás recibe ni expone el hash.
+        Ejemplo ficticio: la fila de <code>valentina@demo.local</code> guarda
+        <code>scrypt$demo$…</code>, nunca <code>v4l3nt1n@21</code>.
+      </p>
+      <ul>
+        <li>Largo mínimo > complejidad forzada (16+ caracteres razonables).</li>
+        <li>Mismas 401 para usuario inexistente y password incorrecto: no
+          revelar cuál falló (anti-enumeración).</li>
+      </ul>
+    </section>
+
+    <section id="sesiones" class="card">
+      <h2><span>6</span> Sesiones</h2>
+      <p>
+        Una <strong>sesión</strong> es estado de "autenticado" que dura desde el
+        login hasta el logout/expiración, mantenido en el servidor (o derivado
+        de un token firmado). El servidor decide cuándo revocarla.
+      </p>
+      <ul>
+        <li>Con estado: el servidor guarda la sesión (cookies HttpOnly).</li>
+        <li>Sin estado: el servidor valida la firma (JWT), no guarda nada.</li>
+      </ul>
+      <p>
+        <span class="badge badge-interp">Interpretación</span> Las sesiones sin
+        estado escalan sin memoria compartida, pero "revocar" un token firmado
+        requiere listas negras o expirar la clave: la comodidad tiene costo.
+      </p>
+    </section>
+
+    <section id="cookies" class="card">
+      <h2><span>7</span> Cookies</h2>
+      <p>
+        Pequeños datos que el navegador guarda y envía con cada petición al
+        dominio. Útiles para transportar el identificador de sesión.
+      </p>
+      <ul>
+        <li><code>HttpOnly</code>: JavaScript no las lee (defensa contra XSS).</li>
+        <li><code>Secure</code>: solo por HTTPS.</li>
+        <li><code>SameSite</code>: controla el envío entre sitios (CSRF).</li>
+      </ul>
+      <p>
+        <span class="badge badge-interp">Interpretación</span> La cookie
+        "recuerda" una sesión <em>por dominio</em>. En una SPA el token va a
+        veces en memoria; la cookie HttpOnly es la alternativa común cuando el
+        frontend no necesita leerlo.
+      </p>
+    </section>
+
+    <section id="bearer" class="card">
+      <h2><span>8</span> Bearer tokens</h2>
+      <p>
+        Un token que otorga acceso y se envía en
+        <code>Authorization: Bearer &lt;token&gt;</code>. "Bearer" = "el que lo
+        porta puede pasar", sin más preguntas.
+      </p>
+      <p>
+        <span class="badge badge-dato">Dato</span> La negligencia del
+        portador (robo del token) es el riesgo principal, así que el canal debe
+        ser HTTPS siempre.
+      </p>
+      <ul>
+        <li>Ventaja: el servidor no guarda estado por petición.</li>
+        <li>Costo: el token tiene vida útil corta (en el taller:
+          <code>expiresIn</code> ≈ 3600 s).</li>
+      </ul>
+    </section>
+
+    <section id="jwt" class="card">
+      <h2><span>9</span> JWT</h2>
+      <p>
+        Formato compacto de token <em>firmado</em>: tres segmentos base64url
+        separados por punto — cabecera <code>header.payload.signature</code>.
+      </p>
+      <ul>
+        <li><span class="badge badge-dato">Dato</span> JWT es un <em>formato</em>, no una
+          solución completa de seguridad.</li>
+        <li><span class="badge badge-dato">Dato</span> <em>Decodificar</em> no verifica: cualquiera
+          lee el payload. Verificar = comprobar la firma.</li>
+        <li><span class="badge badge-dato">Dato</span> <em>Firmado</em> no es <em>cifrado</em>:
+          la firma prueba integridad/origen, no oculta el contenido.</li>
+      </ul>
+      <p>
+        En el taller el backend verifica firma, emisor, audiencia y expiración
+        del JWT en cada request (<code>/auth/me</code>, rutas de requests) con
+        el algoritmo esperado HS256.
+      </p>
+      <details>
+        <summary>Ejemplo ficticio de payload (no uses tokens reales)</summary>
+        <pre>{"id":"usr_2024_valentina","role":"requester","iat":1719000000,"exp":1719003600,"iss":"backend-course-api","aud":"backend-course-client"}</pre>
+      </details>
+      <h3>Inspector ficticio</h3>
+      <p>
+        Mira las tres partes de un JWT <em>falso</em>: se <strong>decodifican</strong>
+        (cualquiera podría), pero nada aquí verifica la firma. Verificar vive en
+        el servidor.
+      </p>
+      <div id="inspector"></div>
+    </section>
+
+    <section id="api-keys" class="card">
+      <h2><span>10</span> API keys</h2>
+      <p>
+        Secretos de larga vida que identifican a una <em>aplicación o servicio</em>,
+        no a un humano. Común entre servidores.
+      </p>
+      <ul>
+        <li><span class="badge badge-dato">Dato</span> Suelen identificar la app, no la identidad
+          del usuario final; no reemplazan la autenticación de personas.</li>
+        <li>Deben rotarse y tratarse como credenciales (nunca en el cliente).</li>
+        <li>Permiten scope y límites de uso por consumidor.</li>
+      </ul>
+      <p>
+        <span class="badge badge-interp">Interpretación</span> Si una app de
+        navegador la guardara en el bundle, cualquiera la podría leer: por eso
+        la API key pública se mueve a un backend/proxy.
+      </p>
+    </section>
+
+    <section id="oauth2" class="card">
+      <h2><span>11</span> OAuth 2</h2>
+      <p>
+        Marco de <em>autorización delegada</em>: una app le da a otra acceso
+        limitado a recursos de un usuario, sin revelar el password del usuario.
+      </p>
+      <p>
+        <span class="badge badge-dato">Dato</span> OAuth trata sobre
+        <em>autorización delegada</em> (scopes), no identidad. Flujos típicos:
+        authorization code, client credentials, device.
+      </p>
+      <p>
+        Ejemplo ficticio: la app "Clima App" pide solo el alcance
+        <code>read:location</code> a tu cuenta, nunca tu password.
+      </p>
+    </section>
+
+    <section id="oidc" class="card">
+      <h2><span>12</span> OpenID Connect</h2>
+      <p>
+        <strong>OpenID Connect (OIDC)</strong> construye identidad encima de
+        OAuth 2: añade el <em>token de identidad</em> (ID token, un JWT) que el
+        cliente puede verificar para saber quién eres.
+      </p>
+      <ul>
+        <li>OAuth 2 = permisos sobre recursos (delegación).</li>
+        <li>OIDC = además, "quién soy" (autenticación).</li>
+      </ul>
+      <p>
+        <span class="badge badge-rec">Recomendación</span> Para "iniciar sesión
+        con Google/GitHub", OIDC es el protocolo moderno habitual, no una
+        autenticación propia reinventada.
+      </p>
+    </section>
+
+    <section id="mfa" class="card">
+      <h2><span>13</span> MFA</h2>
+      <p>
+        <strong>Multi-factor authentication</strong>: exigir al menos dos
+        factores <em>distintos</em> (sabes + tienes, tienes + eres) para subir
+        la barra de robo de credenciales.
+      </p>
+      <ul>
+        <li>App autenticator (TOTP) o llave de seguridad (FIDO2) > SMS.</li>
+        <li>Los códigos de recuperación permiten volver si pierdes el factor.</li>
+      </ul>
+      <p>
+        <span class="badge badge-interp">Interpretación</span> MFA no es
+        infalible: si el factor de "algo que tienes" es un SMS interceptable,
+        la ganancia de seguridad es limitada.
+      </p>
+      <h3>Comparador de mecanismos</h3>
+      <p>
+        Elige dos mecanismos: la tabla compara sus propiedades de forma
+        significativa (no es solo decoración).
+      </p>
+      <div id="comparator"></div>
+    </section>
+
+    <section id="passkeys" class="card">
+      <h2><span>14</span> Passkeys</h2>
+      <p>
+        Credenciales basadas en criptografía de clave pública (WebAuthn): el
+        dispositivo guarda la clave privada, el servidor solo la pública.
+      </p>
+      <ul>
+        <li>El secreto no sale del dispositivo (resistente al phishing).</li>
+        <li>Sin password que robar: autentican con biometría o PIN.</li>
+        <li>Se sincronizan entre dispositivos de un mismo ecosistema.</li>
+      </ul>
+      <p>
+        <span class="badge badge-rec">Recomendación</span> Cuando el público usa
+        dispositivos modernos, passkeys son una opción de futuro cercano frente
+        a passwords frágiles.
+      </p>
+    </section>
+
+    <section id="proveedores" class="card">
+      <h2><span>15</span> Proveedores de identidad</h2>
+      <p>
+        Un <strong>proveedor de identidad (IdP)</strong> es el servicio que
+        autentica y emite credenciales verificables (Google, GitHub, un IdP
+        corporativo…).
+      </p>
+      <ul>
+        <li>La app (SP/Cliente) delega en el IdP vía OIDC/SAML.</li>
+        <li>El usuario presenta el resultado (token de identidad) a la app.</li>
+        <li>Ventajas: no gestionas passwords ni hashes; el IdP sostiene MFA.</li>
+      </ul>
+      <p>
+        En la 05A aún se usa autenticación propia con hash scrypt; un IdP
+        externo es alternativa estudiada, no implementada.
+      </p>
+    </section>
+
+    <section id="propia-vs-gestionada" class="card">
+      <h2><span>16</span> Autenticación propia vs gestionada</h2>
+      <p>
+        Construir autenticación propia (como la del taller) enseña el dominio,
+        pero implica mantener hashing, tokens, revocación, recuperación y
+        pishing-proofing. No siempre conviene.
+      </p>
+      <p>
+        <span class="badge badge-dato">Dato</span> Gestionar passwords y
+        sesiones es un riesgo de seguridad que muchos productos no necesitan
+        asumir: un IdP maduro ya resolvió esos problemas.
+      </p>
+      <p class="callout">
+        <span class="badge badge-decision">Decisión mía</span> Para 05A
+        mantengo autenticación propia (objetivo pedagógico y de evaluación);
+        en un producto real elegiría un IdP gestionado salvo requisito
+        explícito de no-dependencia externa.
+      </p>
+    </section>
+
+    <section id="riesgos" class="card">
+      <h2><span>17</span> Riesgos comunes</h2>
+      <ul>
+        <li>Passwords en claro o hash débil (scrypt/bcrypt/argon2 correctos).</li>
+        <li>Exponer <code>password_hash</code>, tokens o secretos en respuestas.</li>
+        <li>Aceptar <code>createdBy</code>/<code>changedBy</code> del body
+          (falsificar el actor — 400 en el taller).</li>
+        <li>Guardar solo el token en <code>localStorage</code> sin evaluar XSS.</li>
+        <li>Respuestas que distinguen email válido vs no (enumeración).</li>
+        <li>Recursos de otros expuestos con 403 en lugar de 404.</li>
+        <li>Ocultar botones y considerar eso "autorización" (no protege al backend).</li>
+      </ul>
+      <h3>Quiz de la semana</h3>
+      <p>
+        Cinco preguntas de opción múltiple con retroalimentación inmediata y
+        puntaje. Cambia el estado conceptual: responde y mira la explicación.
+      </p>
+      <div id="quiz"></div>
+    </section>
+
+    <section id="casos" class="card">
+      <h2><span>18</span> Casos de uso</h2>
+      <div class="cases">
+        <article><h3>App interna de solicitudes</h3><p>Autenticación propia + roles requester/agent + historial de auditoría. Es exactamente la 05A.</p></article>
+        <article><h3>E-commerce para consumidores</h3><p>IdP gestionado u OIDC social + MFA de alto riesgo (pagos).</p></article>
+        <article><h3>API entre servidores</h3><p>Client credentials / API keys por consumidor, no identidad de persona.</p></article>
+        <article><h3>Cajero / alta sensibilidad</h3><p>MFA + passkeys; la latencia y el factor humano dictan el flujo.</p></article>
+      </div>
+    </section>
+
+    <section id="arbol" class="card">
+      <h2><span>19</span> Árbol de decisión</h2>
+      <p>
+        Interactivo abajo: responde 4 preguntas y obtén una estrategia sugerida
+        de autenticación. Todo ficticio; solo orienta la decisión.
+      </p>
+      <div id="tree"></div>
+    </section>
+
+    <section id="fuentes" class="card">
+      <h2><span>20</span> Fuentes</h2>
+      <ul class="sources">
+        <li><a href="https://datatracker.ietf.org/doc/html/rfc6749">RFC 6749 — OAuth 2.0 Authorization Framework</a> (dato)</li>
+        <li><a href="https://datatracker.ietf.org/doc/html/rfc6750">RFC 6750 — Bearer Token Usage</a> (dato)</li>
+        <li><a href="https://datatracker.ietf.org/doc/html/rfc7519">RFC 7519 — JSON Web Token</a> (dato)</li>
+        <li><a href="https://openid.net/connect/">OpenID Connect (OpenID Foundation)</a> (dato)</li>
+        <li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html">OWASP — Authentication Cheat Sheet</a> (recomendación)</li>
+        <li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html">OWASP — Password Storage Cheat Sheet</a> (recomendación)</li>
+        <li><a href="https://www.w3.org/TR/webauthn-3/">W3C — WebAuthn</a> (passkeys, dato)</li>
+        <li><a href="https://pages.nist.gov/800-63-3/sp800-63b.html">NIST SP 800-63B — Digital Identity Guidelines</a> (dato)</li>
+        <li>Taller 05A — <code>request-api-v5-starter</code>: <code>auth.service</code>, <code>token.txt</code>, <code>password.txt</code>, <code>request.policy.txt</code>, migraciones 003–005 (implementación) .</li>
+        <li>Decisión propia para estructura y jerarquía de presentación (basada en las fuentes anteriores).</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Todo el material de esta entrega es ficticio; ninguna credencial es real.</p>
+  </footer>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
