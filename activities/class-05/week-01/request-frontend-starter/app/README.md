@@ -108,7 +108,8 @@ documentar su costo.
 
 ## Evidencia de integración
 
-- Build exitoso: `npm run build` (multi-page: `/`, `/app`, `/learn`).
+- Build exitoso: `npm run build` (páginas: `/` y `/app`; la 05B vive en
+  `activities/class-05/week-02`).
 - Validación del backend detrás de esta UI: boss battle **12/12** en
   `taller/project/activities/class-05/validation-evidence.md`.
 - Captura del flujo: ver la matriz de escenarios probados (arriba) + el repo.
