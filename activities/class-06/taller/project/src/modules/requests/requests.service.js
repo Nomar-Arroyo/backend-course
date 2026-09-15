@@ -9,13 +9,15 @@ import {
   findById,
   insertRequest,
   updateRequest,
-  insertHistoryEvent
+  insertHistoryEvent,
+  findHistory
 } from './requests.store.js';
-import { mapRequestRow } from './request.mapper.js';
+import { mapRequestRow, mapHistoryEventRow } from './request.mapper.js';
 import { STATUSES, isValidStatus, isTerminal, canTransition } from './request-status.js';
 import {
   canListAllRequests,
   canViewRequest,
+  canViewHistory,
   canCreateRequest,
   canEditContent,
   canChangePriority,
@@ -86,6 +88,20 @@ export async function getRequest(actor, id) {
   const request = mapRequestRow(row);
   if (!canViewRequest(actor, request)) throw notFound(id);
   return request;
+}
+
+export async function getRequestHistory(actor, id) {
+  // Same visibility policy as GET /requests/:id: an agent may read any
+  // history, a requester only their own. A foreign request must not
+  // reveal that it exists — same status, code and shape as a missing one.
+  const row = await findById(id);
+  if (!row) throw notFound(id);
+
+  const request = mapRequestRow(row);
+  if (!canViewHistory(actor, request)) throw notFound(id);
+
+  const events = await findHistory(id);
+  return events.map(mapHistoryEventRow);
 }
 
 export async function createRequest(actor, input) {
