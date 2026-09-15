@@ -72,11 +72,10 @@ export async function listRequests(actor, filters) {
     ? filters
     : { ...filters, createdBy: actor.userId };
 
+  // A collection with zero matches is still a valid collection: it answers
+  // an empty array, never 404. 404 is reserved for an individual resource
+  // that does not exist (or must not be revealed).
   const rows = await findAll(scope);
-  if (rows.length === 0) {
-    // Nothing matched the given filters.
-    throw new AppError('resource', 'REQUEST_NOT_FOUND', 'No requests matched the given filters.');
-  }
   return rows.map(mapRequestRow);
 }
 

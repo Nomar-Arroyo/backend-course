@@ -58,6 +58,18 @@ test('the collection requires a Bearer token', async () => {
   assert.equal(response.status, 401);
 });
 
+test('a valid filter with zero matches answers 200 with an empty array (regression BUG-106)', async () => {
+  const owner = await createUser({ name: 'emptyfilter' });
+  const token = await loginAs(owner);
+
+  const response = await request(app)
+    .get('/requests?status=closed')
+    .set('Authorization', `Bearer ${token}`);
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(response.body, []);
+});
+
 test('a requester cannot change the priority, even of their own request', async () => {
   const owner = await createUser({ name: 'nopriority' });
   const token = await loginAs(owner);
