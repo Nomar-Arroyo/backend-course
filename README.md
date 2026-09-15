@@ -133,6 +133,25 @@ Documentación interactiva (proyecto Vite independiente, justificado en su
 `README.md`): 20 contenidos, 4 interacciones (inspector ficticio de JWT,
 comparador de mecanismos, quiz, árbol de decisión) y fuentes trazables.
 
+### Clase 06 — taller de onboarding (primer ticket en un backend existente)
+
+```bash
+cd activities/class-06/taller/project
+npm install
+copy .env.example .env   # pegar DATABASE_URL (Supabase, Transaction pooler 6543)
+npm run db:migrate        # idempotente; segunda vez omite
+npm run db:seed           # 2 requesters + 1 agent + 6 requests + 15 history events
+npm run class-06:doctor   # debe mostrar "Environment ready"
+npm run validate:class-06 # debe terminar FINAL RESULT: PASSED
+npm start
+```
+
+Taller autodirigido con IA: un repo ajeno con 2 tickets. BUG-106 (colección
+filtrada vacía devolvía 404) corregido; FEATURE-206 (`GET /requests/:id/history`)
+implementado. Commits sugeridos: `class-06-environment-ready`,
+`class-06-regression-fixed`, `class-06-submission`. Tag final:
+`class-06-submission`.
+
 ## Estado de las entregas
 
 | Entrega | Estatus | Observaciones |
@@ -143,6 +162,7 @@ comparador de mecanismos, quiz, árbol de decisión) y fuentes trazables.
 | 04 · De SQL al backend persistente | ✅   Entregada   | Tags `class-04-design` (marca de diseño) y `class-04-submission`; PostgreSQL en Supabase, matriz de 12 casos verificada con `curl` (persistencia y rollback) |
 | 05A · Interfaz real de solicitudes | ✅   Entregada   | Tags `class-05-design` (marca de diseño) y `class-05-submission` (entrega 05B); taller 12/12 (boss battle), frontend `week-01` sobre API real |
 | 05B · El mundo de la autenticación | ✅   Entregada   | `week-02/`: 20 contenidos, 4 interacciones significativas, fuentes trazables, todo ficticio |
+| 06 · Primer ticket en backend existente | ✅   Entregada   | Tag `class-06-submission`; BUG-106 + FEATURE-206; validador PASSED 12/12 en Supabase nueva |
 
 ## Reglas del curso que se respetan aquí
 
