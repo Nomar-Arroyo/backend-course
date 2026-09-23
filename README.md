@@ -26,6 +26,8 @@ evidencia reproducible, explicación conceptual, sección `AI usage` y reflexió
 | [03](activities/class-03/) | Recursos, estado y reglas | Diseño previo sin IA, máquina de estados, `PATCH`, filtros y errores unificados | `class-03-design` · `class-03-submission` |
 | [04](activities/class-04/) | De SQL al backend persistente | PostgreSQL (Supabase), historial de estados, transacciones con rollback, errores sin secretos | `class-04-design` · `class-04-submission` |
 | [05](activities/class-05/) | Seguridad e identidad + frontend real | Registro, hashing scrypt, login con JWT, middleware `authenticate`, propiedad y permisos (12/12); entregas 05A (interfaz `/app`) y 05B (documentación interactiva `/learn`) | `class-05-design` · `class-05-submission` |
+| [06](activities/class-06/) | Primer ticket en backend existente | Onboarding con IA: BUG-106 (404 en colección filtrada vacía) y FEATURE-206 (`GET /requests/:id/history`), validador 12/12 | `class-06-submission` |
+| [07](activities/class-07/) | Cuando el backend falla | REPL → testes: INC-701 (id inválido 400), INC-702 (prioridad inválida 400), OPS-703 (requestId + error handler central + `/health` y `/ready`), 38 pruebas y validador 12/12 | `class-07-submission` |
 
 ## Instrucciones de ejecución
 
@@ -152,6 +154,28 @@ implementado. Commits sugeridos: `class-06-environment-ready`,
 `class-06-regression-fixed`, `class-06-submission`. Tag final:
 `class-06-submission`.
 
+### Clase 07 — cuando el backend falla (REPL → teste)
+
+```bash
+cd activities/class-07/taller/project
+npm install
+copy .env.example .env   # pegar DATABASE_URL (Supabase, Transaction pooler 6543)
+npm run db:migrate        # idempotente; segunda vez SKIPPED
+npm run class-07:doctor   # debe mostrar "Environment ready" (7/7)
+npm test                  # suite completa
+npm run incidents:reproduce   # INC-701/702/703 RESOLVED
+npm run validate:class-07     # debe terminar FINAL RESULT: PASSED
+npm start
+```
+
+Taller de guerrillas del error: 3 incidentes investigados con REPL y
+diagnóstico real. INC-701 (id inválido → 400 `INVALID_REQUEST_ID`),
+INC-702 (prioridad inválida → 400 `INVALID_PRIORITY`) y OPS-703
+(observabilidad: `X-Request-Id`, error handler central, `/health` y
+`/ready`, logs JSON en allowlist). 17 stubs → 17 pruebas implementadas
+(38 en total). Commits: `class-07-baseline`, `class-07-incidents-resolved`,
+`class-07-submission`. Tag final: `class-07-submission`.
+
 ## Estado de las entregas
 
 | Entrega | Estatus | Observaciones |
@@ -163,6 +187,7 @@ implementado. Commits sugeridos: `class-06-environment-ready`,
 | 05A · Interfaz real de solicitudes | ✅   Entregada   | Tags `class-05-design` (marca de diseño) y `class-05-submission` (entrega 05B); taller 12/12 (boss battle), frontend `week-01` sobre API real |
 | 05B · El mundo de la autenticación | ✅   Entregada   | `week-02/`: 20 contenidos, 4 interacciones significativas, fuentes trazables, todo ficticio |
 | 06 · Primer ticket en backend existente | ✅   Entregada   | Tag `class-06-submission`; BUG-106 + FEATURE-206; validador PASSED 12/12 en Supabase nueva |
+| 07 · Cuando el backend falla | ✅   Entregada   | Tag `class-07-submission`; INC-701 + INC-702 + OPS-703; validador PASSED 12/12; 38 pruebas de regresión |
 
 ## Reglas del curso que se respetan aquí
 
