@@ -27,7 +27,7 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   try {
-    res.status(200).json(await getRequest(req.auth, Number(req.params.id)));
+    res.status(200).json(await getRequest(req.auth, req.params.id));
   } catch (error) {
     respondError(res, error);
   }
@@ -35,7 +35,7 @@ router.get('/:id', async (req, res) => {
 
 router.get('/:id/history', async (req, res) => {
   try {
-    res.status(200).json(await getHistory(req.auth, Number(req.params.id)));
+    res.status(200).json(await getHistory(req.auth, req.params.id));
   } catch (error) {
     respondError(res, error);
   }
@@ -51,7 +51,7 @@ router.post('/', async (req, res) => {
 
 router.patch('/:id', async (req, res) => {
   try {
-    res.status(200).json(await patchRequest(req.auth, Number(req.params.id), req.body));
+    res.status(200).json(await patchRequest(req.auth, req.params.id, req.body));
   } catch (error) {
     respondError(res, error);
   }
