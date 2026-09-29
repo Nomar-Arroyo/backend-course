@@ -37,3 +37,82 @@ con la suite en verde después de CADA paso (39/0) y con la misma ruta,
 mismo 200 y mismo body de eventos; que la feature sirve al contrato se
 demostró con 13 pruebas nuevas y el validador 12/12 PASSED, que además
 verifica las fronteras: la ruta sin SQL y el service sin Express.
+
+## Ticket de salida
+
+**01 · ¿Qué es refactorizar — y qué NO puede cambiar?**
+
+Reestructurar código sin cambiar su comportamiento observable. No puede
+cambiar: ruta, status, body ni permiso (la regla del refactor-log).
+
+**02 · ¿Cómo detectas que un handler tiene demasiadas responsabilidades?**
+
+Tiene más de un motivo para cambiar: el de `GET /:id/history` parseaba el
+id, corría SQL con `pool`, decidía visibilidad y mapeaba a mano. Señales:
+duplica otras capas y mezcla HTTP con SQL (imports de `pool` y `AppError`
+en la ruta).
+
+**03 · ¿Qué diferencia hay entre cohesión y acoplamiento?**
+
+Cohesión = qué tan unido está lo que pertenece a una capa (el mapper solo
+da forma, el store solo SQL). Acoplamiento = dependencia entre capas (la
+ruta no debe conocer `pg`, el service no debe conocer Express). Alto
+cohesión, bajo acoplamiento.
+
+**04 · ¿Por qué claim es una acción de negocio y no un PATCH genérico?**
+
+Porque reasignar aplica reglas (rol + open + sin asignar) y dispare
+efectos con atomicidad (evento `request_claimed` en la misma transacción).
+Un PATCH genérico expondría `assignedTo` al body (400 SERVER_CONTROLLED_FIELD)
+y no garantizaría historial.
+
+**05 · ¿Qué garantiza la FK de assigned_to — y qué no?**
+
+Garantiza integridad referencial: el id solo apunta a un usuario existente.
+No garantiza la regla de negocio: agente, request `open` y sin reclamar —
+eso vive en la policy y el service.
+
+**06 · ¿Por qué la migración 005 no edita la 003 para ampliar el CHECK?**
+
+Las aplicadas (001-004) están registradas en `schema_migrations` y ya
+corrieron; editarlas diverge entornos. 005 es una migración nueva que
+evoluciona sin tocar lo aplicado.
+
+**07 · ¿Por qué asignación e historial comparten transacción?**
+
+Son una sola unidad de trabajo: si uno de los dos falla a medias quedaría
+una request asignada sin evento, o un evento fantasma. `withTransaction`:
+ambos comiten o ambos revierten.
+
+**08 · ¿Por qué la policy devuelve razones y no true/false?**
+
+Un false no le dice al service qué responder: la policy devuelve
+NOT_AGENT (403), ALREADY_ASSIGNED (409) y NOT_OPEN (409) para que el
+service traduzca el código de dominio correcto con su requestId.
+
+**09 · ¿Qué comprueban los checks de frontera del validador (11 y 12)?**
+
+Check 11: las routes no contienen SQL ni dependencias de la base (ruta
+delgada). Check 12: el service no importa Express (no depende de req/res).
+Impiden que HTTP y persistencia se contaminen entre capas.
+
+**10 · ¿Cómo se usa tu reporte del checkpoint 1-7 en la evaluación del curso?**
+
+El docente revisa RESULT_CODE + JSON (K-P-V-E por clase, ACTION), lo cruza
+con mi evidencia y el examen, y puede verificar oralmente. El reporte marcó
+V=2 en clases 1-5 y `oralVerificationRecommended` → por eso quedó el repaso
+oral (`oral-rehearsal-01-07.md`).
+
+**11 · ¿Qué le pediste a la IA hoy — y qué decidiste tú?**
+
+Le pedí propuestas: dónde ubicar `getHistory`, el diseño de
+`canClaimRequest` y si convenía consultar el historial antes de autorizar
+(lo descarté por el 404-as-missing). Yo decidí el contrato del claim, no
+editar migraciones y pasar el validador antes de comitear.
+
+**12 · ¿Qué parte del módulo entiendes mejor ahora que esta mañana — y cuál sigue nublada?**
+
+Mejor: por qué la ruta debe ser delgada y cómo la transacción mantiene el
+historial consistente con el claim. Nublada: cuándo dividir el service en
+módulos más finos sin sobre-arquitecturar (la advertencia del refactor-log
+sobre QueryHandlers).
