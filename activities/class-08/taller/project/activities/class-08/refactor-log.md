@@ -30,7 +30,7 @@ permiso, no fue solamente un refactor.
   history y el check "Previous behavior preserved" del validador lo
   confirman.
 * Suite completa en verde: sí — 39 pass / 0 fail / 13 todo.
-* Commit del refactor: `class-08-refactor` — [hash en el cierre de la clase]
+* Commit del refactor: `class-08-refactor` — `1412cc5` (la feature quedó en `131f0fc`, class-08-feature, con las pruebas de policy y claim).
 
 ## Qué preguntaste a la IA (y qué verificaste)
 
