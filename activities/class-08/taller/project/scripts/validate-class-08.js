@@ -147,8 +147,11 @@ const CHECKS = [
 
   ['Baseline', 'Existing tests pass', async () => {
     try {
+      // POSIX machines may offer /bin/bash; Windows resolves the default
+      // shell (cmd) transparently — the suite must be green either way.
+      const posix = process.platform !== 'win32' ? '/bin/bash' : undefined;
       execSync(`node --test --test-concurrency=1 'test/*.test.js'`, {
-        cwd: ROOT, stdio: 'pipe', timeout: 180000, shell: '/bin/bash'
+        cwd: ROOT, stdio: 'pipe', timeout: 180000, shell: posix
       });
       return null;
     } catch (error) {

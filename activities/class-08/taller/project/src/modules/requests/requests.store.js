@@ -12,6 +12,7 @@ const REQUEST_COLUMNS = `
   priority,
   status,
   created_by,
+  assigned_to,
   created_at,
   updated_at
 `;
@@ -100,6 +101,20 @@ export async function insertHistoryEvent(event, db = pool) {
     [requestId, type, fromStatus ?? null, toStatus ?? null,
       fromPriority ?? null, toPriority ?? null, changedBy ?? null]
   );
+}
+
+export async function assignRequest(id, assignedTo, db = pool) {
+  // The claim is one write: it assigns WHO is responsible and changes the
+  // status to in_progress (open -> in_progress) while refreshing
+  // updated_at, exactly like every write since class 04.
+  const result = await db.query(
+    `UPDATE requests
+     SET assigned_to = $2, status = 'in_progress', updated_at = CURRENT_TIMESTAMP
+     WHERE id = $1
+     RETURNING ${REQUEST_COLUMNS}`,
+    [id, assignedTo]
+  );
+  return result.rows[0] ?? null;
 }
 
 export async function findHistory(requestId, db = pool) {

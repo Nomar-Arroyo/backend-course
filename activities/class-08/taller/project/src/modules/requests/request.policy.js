@@ -44,22 +44,27 @@ export function canChangeStatus(actor) {
   return actor.role === 'agent';
 }
 
-// TODO(FEATURE-801) · Claim policy (guided skeleton).
-//
-// The claim rule must be testable with PLAIN OBJECTS: no SQL, no JWT, no
-// Express, no HTTP errors. That is the whole point of putting it here.
-//
-// Checklist:
-//   [ ] Receive { actor, request } (already-mapped representation).
-//   [ ] Only an agent may claim               -> reason 'NOT_AGENT'
-//   [ ] An assigned request cannot be claimed -> reason 'ALREADY_ASSIGNED'
-//   [ ] Only an open request can be claimed   -> reason 'NOT_OPEN'
-//   [ ] Otherwise: { allowed: true }
-//
-// Why an explicit result instead of a boolean? Claim has THREE distinct
-// denial reasons and each maps to a different HTTP answer (403/409/409).
-// The policy names the reason; the SERVICE translates it to an AppError.
+// Claim policy (FEATURE-801). Pure function over a plain { actor, request }:
+// no SQL, no JWT, no Express, no HTTP errors — the reason it is testable
+// without a server or a database. Claim has THREE distinct denial reasons
+// and each maps to a different HTTP answer (403/409/409). The policy names
+// the reason; the SERVICE translates it to an AppError.
 export function canClaimRequest({ actor, request }) {
-  // TODO(FEATURE-801): replace this placeholder with the real rules.
-  return { allowed: false, reason: 'NOT_IMPLEMENTED' };
+  // Only an agent may claim — the role rule wins over the state rules:
+  // even an assigned or non-open request reports NOT_AGENT first, so the
+  // caller answers 403 before any state conflict is ever considered.
+  if (actor.role !== 'agent') {
+    return { allowed: false, reason: 'NOT_AGENT' };
+  }
+  // An assigned request is already taken: claiming it again is a
+  // conflict with its current state.
+  if (request.assignedTo !== null && request.assignedTo !== undefined) {
+    return { allowed: false, reason: 'ALREADY_ASSIGNED' };
+  }
+  // The claim is the open -> in_progress move; every other state (even
+  // non-terminal ones like in_progress or resolved) is not claimable.
+  if (request.status !== 'open') {
+    return { allowed: false, reason: 'NOT_OPEN' };
+  }
+  return { allowed: true };
 }

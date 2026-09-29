@@ -10,7 +10,8 @@ import {
   insertRequest,
   updateRequest,
   insertHistoryEvent,
-  findHistory
+  findHistory,
+  assignRequest
 } from './requests.store.js';
 import { mapRequestRow, mapHistoryEventRow } from './request.mapper.js';
 import { STATUSES, isValidStatus, isTerminal, canTransition } from './request-status.js';
@@ -21,7 +22,8 @@ import {
   canCreateRequest,
   canEditContent,
   canChangePriority,
-  canChangeStatus
+  canChangeStatus,
+  canClaimRequest
 } from './request.policy.js';
 import { AppError } from '../../app-error.js';
 
@@ -222,6 +224,48 @@ export async function patchRequest(actor, id, body) {
         changedBy: actor.userId
       }, client);
     }
+    return updated;
+  });
+
+  return mapRequestRow(row);
+}
+
+// FEATURE-801 · Claim a request. The identity of WHO claims comes from the
+// authenticated actor — assignedTo is server-controlled, so sending it in
+// the body is rejected explicitly, like every other server-controlled
+// field. The claim is one unit of work: assignment, status move and
+// history event commit together or not at all.
+export async function claimRequest(actor, id, body) {
+  rejectServerControlledFields(body, ['assignedTo']);
+
+  const row = await withTransaction(async (client) => {
+    const current = await findById(id, client);
+    if (!current) throw notFound(id);
+
+    const request = mapRequestRow(current);
+    const verdict = canClaimRequest({ actor, request });
+    if (!verdict.allowed) {
+      if (verdict.reason === 'NOT_AGENT') {
+        throw forbidden('Only agents can claim requests.');
+      }
+      if (verdict.reason === 'ALREADY_ASSIGNED') {
+        throw new AppError('domain', 'REQUEST_ALREADY_ASSIGNED',
+          'The request is already assigned.');
+      }
+      // NOT_OPEN: open is the only claimable state (the policy covers the
+      // terminal states AND in_progress/resolved).
+      throw new AppError('domain', 'REQUEST_NOT_OPEN',
+        'Only open requests can be claimed.');
+    }
+
+    const updated = await assignRequest(id, actor.userId, client);
+    await insertHistoryEvent({
+      requestId: id,
+      type: 'request_claimed',
+      fromStatus: request.status,
+      toStatus: updated.status,
+      changedBy: actor.userId
+    }, client);
     return updated;
   });
 

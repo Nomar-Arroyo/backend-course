@@ -10,6 +10,7 @@ export function mapRequestRow(row) {
     priority: row.priority,
     status: row.status,
     createdBy: row.created_by,
+    assignedTo: row.assigned_to,
     createdAt: row.created_at,
     updatedAt: row.updated_at
   };
