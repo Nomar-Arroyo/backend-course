@@ -9,13 +9,15 @@ import {
   findById,
   insertRequest,
   updateRequest,
-  insertHistoryEvent
+  insertHistoryEvent,
+  findHistory
 } from './requests.store.js';
-import { mapRequestRow } from './request.mapper.js';
+import { mapRequestRow, mapHistoryEventRow } from './request.mapper.js';
 import { STATUSES, isValidStatus, isTerminal, canTransition } from './request-status.js';
 import {
   canListAllRequests,
   canViewRequest,
+  canViewHistory,
   canCreateRequest,
   canEditContent,
   canChangePriority,
@@ -86,6 +88,20 @@ export async function getRequest(actor, id) {
   const request = mapRequestRow(row);
   if (!canViewRequest(actor, request)) throw notFound(id);
   return request;
+}
+
+export async function getHistory(actor, id) {
+  // The visibility decision comes FIRST, with the same 404-as-missing
+  // answer the ownership contract promised since class 05. Only then the
+  // history is read and represented.
+  const row = await findById(id);
+  if (!row) throw notFound(id);
+
+  const request = mapRequestRow(row);
+  if (!canViewHistory(actor, request)) throw notFound(id);
+
+  const historyRows = await findHistory(id);
+  return historyRows.map(mapHistoryEventRow);
 }
 
 export async function createRequest(actor, input) {
