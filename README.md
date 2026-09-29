@@ -28,6 +28,7 @@ evidencia reproducible, explicación conceptual, sección `AI usage` y reflexió
 | [05](activities/class-05/) | Seguridad e identidad + frontend real | Registro, hashing scrypt, login con JWT, middleware `authenticate`, propiedad y permisos (12/12); entregas 05A (interfaz `/app`) y 05B (documentación interactiva `/learn`) | `class-05-design` · `class-05-submission` |
 | [06](activities/class-06/) | Primer ticket en backend existente | Onboarding con IA: BUG-106 (404 en colección filtrada vacía) y FEATURE-206 (`GET /requests/:id/history`), validador 12/12 | `class-06-submission` |
 | [07](activities/class-07/) | Cuando el backend falla | REPL → testes: INC-701 (id inválido 400), INC-702 (prioridad inválida 400), OPS-703 (requestId + error handler central + `/health` y `/ready`), 38 pruebas y validador 12/12 | `class-07-submission` |
+| [08](activities/class-08/) | Refactoring y responsabilidades | Refactor seguro de `GET /:id/history` por capas + FEATURE-801 (`POST /requests/:id/claim`) con transacción y evento `request_claimed`, mapa de responsabilidades, suite 52/0/0, validador 12/12 y checkpoint acumulativo 1-7 con IA | `class-08-submission` |
 
 ## Instrucciones de ejecución
 
@@ -176,6 +177,27 @@ INC-702 (prioridad inválida → 400 `INVALID_PRIORITY`) y OPS-703
 (38 en total). Commits: `class-07-baseline`, `class-07-incidents-resolved`,
 `class-07-submission`. Tag final: `class-07-submission`.
 
+### Clase 08 — refactoring y responsabilidades
+
+```bash
+cd activities/class-08/taller/project
+npm install
+copy .env.example .env   # pegar DATABASE_URL (Supabase, Transaction pooler 6543)
+npm run db:migrate        # idempotente; 005_add_request_assignment.sql ya aplicada
+npm run db:seed           # v8: 2 requesters + 1 agent + 6 requests + 15 history events
+npm test                  # suite completa: 52 pass / 0 fail / 0 todo (Windows: npm test funciona)
+npm run validate:class-08     # debe terminar FINAL RESULT: PASSED (12/12)
+npm start
+```
+
+Taller "el cambio pequeño que toca todo": refactor con la suite como red
+(handler gordo de `GET /:id/history` desarmado en route/service/store/
+policy/mapper, contrato intacto) y FEATURE-801 (`POST /requests/:id/claim`:
+solo agente, request `open` y sin asignar, transacción con evento
+`request_claimed`, 409 por conflicto). 13 stubs convertidos en pruebas
+(suite 52/52). Commits: `class-08-baseline`, `class-08-refactor`,
+`class-08-feature`, `class-08-submission`. Tag final: `class-08-submission`.
+
 ## Estado de las entregas
 
 | Entrega | Estatus | Observaciones |
@@ -188,6 +210,7 @@ INC-702 (prioridad inválida → 400 `INVALID_PRIORITY`) y OPS-703
 | 05B · El mundo de la autenticación | ✅   Entregada   | `week-02/`: 20 contenidos, 4 interacciones significativas, fuentes trazables, todo ficticio |
 | 06 · Primer ticket en backend existente | ✅   Entregada   | Tag `class-06-submission`; BUG-106 + FEATURE-206; validador PASSED 12/12 en Supabase nueva |
 | 07 · Cuando el backend falla | ✅   Entregada   | Tag `class-07-submission`; INC-701 + INC-702 + OPS-703; validador PASSED 12/12; 38 pruebas de regresión |
+| 08 · Refactoring y responsabilidades | ✅   Entregada   | Tag `class-08-submission`; refactor de `GET /:id/history` + FEATURE-801 (claim); 52/52 pruebas; validador PASSED 12/12; checkpoint acumulativo 1-7 con IA (evidencia + autoevaluación + examen) |
 
 ## Reglas del curso que se respetan aquí
 
