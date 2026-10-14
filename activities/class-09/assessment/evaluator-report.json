@@ -1,0 +1,136 @@
+{
+  "protocolVersion": "ITSU-KNOWLEDGE-09-1.0",
+  "rubricVersion": "BACKEND-01-08-K1",
+  "evaluationId": "K09-nomar-arroyo-itsu-405d3ca",
+  "studentId": "nomar-arroyo-itsu",
+  "commit": "405d3ca",
+  "variant": "A",
+  "status": "PARTIAL",
+  "action": "SUPPORT",
+  "questions": [
+    {
+      "questionId": "Q1",
+      "topics": [
+        "HTTP",
+        "request flow"
+      ],
+      "levels": {
+        "conceptual": 3,
+        "grounding": 3,
+        "reasoning": 3,
+        "verification": 1
+      },
+      "evidence": [
+        "Contrato citado con src/http/parse-id.js, app.js y test/request-detail.test.js",
+        "Componentes reales identificados: authenticate, token, routes, service, store, policy y mapper",
+        "Orden de ejecución descrito y primera función propia: corsPolicy en src/middleware/cors.js"
+      ],
+      "strength": "Conecta contrato y recorrido con archivos concretos del repositorio.",
+      "gap": "No registró la corrección entre predicción y hallazgos (punto 7 del guion).",
+      "rectification": "",
+      "confidence": "medium"
+    },
+    {
+      "questionId": "Q2",
+      "topics": [
+        "transactions",
+        "invariants"
+      ],
+      "levels": {
+        "conceptual": "X",
+        "grounding": "X",
+        "reasoning": "X",
+        "verification": "X"
+      },
+      "evidence": [],
+      "strength": "",
+      "gap": "No evaluada por tiempo agotado.",
+      "rectification": "",
+      "confidence": "low"
+    },
+    {
+      "questionId": "Q3",
+      "topics": [
+        "authn vs authz"
+      ],
+      "levels": {
+        "conceptual": "X",
+        "grounding": "X",
+        "reasoning": "X",
+        "verification": "X"
+      },
+      "evidence": [],
+      "strength": "",
+      "gap": "No evaluada por tiempo agotado.",
+      "rectification": "",
+      "confidence": "low"
+    },
+    {
+      "questionId": "Q4",
+      "topics": [
+        "diagnostics"
+      ],
+      "levels": {
+        "conceptual": "X",
+        "grounding": "X",
+        "reasoning": "X",
+        "verification": "X"
+      },
+      "evidence": [],
+      "strength": "",
+      "gap": "No evaluada por tiempo agotado.",
+      "rectification": "",
+      "confidence": "low"
+    },
+    {
+      "questionId": "Q5",
+      "topics": [
+        "change analysis"
+      ],
+      "levels": {
+        "conceptual": "X",
+        "grounding": "X",
+        "reasoning": "X",
+        "verification": "X"
+      },
+      "evidence": [],
+      "strength": "",
+      "gap": "No evaluada por tiempo agotado.",
+      "rectification": "",
+      "confidence": "low"
+    }
+  ],
+  "priorityGaps": [
+    {
+      "questionId": "Q1",
+      "dimension": "verification",
+      "description": "Registrar predicción y sus correcciones al contrastar con el código."
+    }
+  ],
+  "strengths": [
+    "Buena conexión entre contrato y recorrido con evidencias del repositorio."
+  ],
+  "recommendedStudyActions": [
+    "Practicar: anotar predicción explícita y listar qué corrigió tras inspeccionar.",
+    "Revisar boundary HTTP/dominio y primer componente propio.",
+    "Repasar verificación con comandos/pruebas para distinguir hipótesis."
+  ],
+  "reviewSignals": [
+    "NONE"
+  ],
+  "teacherReview": {
+    "priority": "medium",
+    "oralVerificationRecommended": true,
+    "questions": [
+      {
+        "text": "¿Qué parte de tu predicción inicial corregiste al mirar el código real de GET /requests/:id?",
+        "expectedAnswer": "Mencionar al menos una corrección concreta (ej. política no invocada vs invocada, orden de middlewares, etc.)"
+      }
+    ],
+    "minimumExpectedAnswers": [
+      "Corrección explícita entre predicción y hallazgos."
+    ],
+    "reason": "Tiempo agotado. Solo Q1 evaluada parcialmente.",
+    "digest": "Q1 sólida en grounding; falta verificación (predicción corregida)."
+  }
+}
