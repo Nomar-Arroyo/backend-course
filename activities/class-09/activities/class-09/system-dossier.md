@@ -75,6 +75,9 @@ función en cada paso:
    (`src/modules/requests/requests.service.js:224`) y `patchRequest`
    también (`src/modules/requests/requests.service.js:162`). **Esta es la
    causa raíz de BUG-901.**
+   **Estado tras el fix (`class-09-fix`):** `getRequest` ahora mapea la
+   fila una sola vez, consulta `canViewRequest` y lanza `notFound(id)` si
+   el actor no puede verla — el mismo patrón que `getHistory`.
 6. Service: `src/modules/requests/requests.service.js:86-93`
    (`getRequest`), sin transacción (solo lectura).
 7. Store y query: `src/modules/requests/requests.store.js:50-56`

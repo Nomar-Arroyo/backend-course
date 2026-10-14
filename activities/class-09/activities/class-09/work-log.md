@@ -80,41 +80,100 @@ dossier, commiteado como `class-09-analysis` ANTES del fix.
 
 ## What I observed before asking AI
 
-[COMPLETAR — qué habías leído/ejecutado tú antes de preguntar.]
+* Leí `README.md`, `tickets/BUG-901.md` y `recovery/environment.md` para
+  entender el encargo y no gastar el taller en el entorno.
+* Corrí el baseline completo (doctor, migraciones, seed, suite) y anoté
+  que quedaban 5 pruebas en `todo` — justo las del caso "ajeno".
+* Abrí `src/modules/requests/requests.service.js` y vi la asimetría:
+  `getRequest` (`:86-93`) devuelve la fila mapeada SIN consultar la
+  policy, con un comentario `TEMP(REQ-442)`; en cambio `getHistory`
+  (`:224`) y `patchRequest` (`:162`) sí llaman `canViewRequest`.
+* Reproduje el acceso indebido con usuarios y una solicitud sintéticas
+  (ver arriba): el requester ajeno recibía `200`. Ese fue mi punto de
+  partida, no la sospecha.
 
 ## What I asked
 
-[COMPLETAR — las preguntas, resumidas.]
+* Si la causa estaba en la policy (¿estaba mal la regla?) o en quién la
+  consulta.
+* Dónde debía ir la corrección mínima sin crear capas nuevas.
+* Cómo convertir las 5 pruebas `todo` en regresiones rojas→verdes sin
+  inventar infraestructura.
+* Si el caso "no visible" debía ser `403` o `404`.
 
 ## What the AI proposed
 
-[COMPLETAR]
+* Confirmó que `canViewRequest` es correcta y pura, y que el defecto es
+  que `getRequest` no la consulta; propuso el cambio mínimo en el service.
+* Sugirió mapear la fila UNA vez, consultar la policy y lanzar el
+  `notFound(id)` existente (mismo helper que ya usa `getHistory`).
+* Recomendó convertir primero los `todo`, verlos fallar contra el bug y
+  luego aplicar el fix, para dejar evidencia roja→verde.
+* Insistió en NO tocar la policy, el store, las rutas ni el esquema.
 
 ## Evidence I checked
 
-[COMPLETAR — archivo por archivo: qué afirmación verificaste y contra qué.]
+* `src/modules/requests/requests.service.js:86-93` (detalle sin policy)
+  vs `:224` (historial con policy) vs `:162` (patch con policy).
+* `src/modules/requests/request.policy.js:20-23` — la regla de visibilidad.
+* `src/modules/requests/requests.routes.js:30` — la respuesta `200` sale
+  del router; el id se valida antes en `src/http/parse-id.js:16-21`.
+* `src/middleware/error-handler.js:18-24` — la categoría `resource` → 404.
+* `test/request-detail.test.js` — las 9 llaves congeladas del schema, que
+  mi fix no debía alterar.
+* El resultado de mi reproducción manual (stranger `200`).
 
 ## What I accepted
 
-[COMPLETAR]
+* El fix mínimo en `getRequest`: mapear una vez, `canViewRequest` y
+  `notFound(id)`. Reutiliza lo que ya existe (el ticket lo pide).
+* Convertir las 5 pruebas `todo` (3 puras + 2 con base).
+* Mantener el `404` para "no visible", indistinguible del inexistente.
 
 ## What I rejected
 
-[COMPLETAR — y por qué: esta sección vale más que la anterior.]
+* Responder `403`: rompería la decisión de ESTE sistema (no confirmar
+  existencia) y permitiría enumerar ids. El propio ticket lo dice.
+* Meter el chequeo en un middleware nuevo o en la ruta: crea una capa que
+  el ticket prohíbe y duplica la autorización que ya vive en la policy.
+* Cambiar `request.policy.js`: está correcta; el problema no era la regla.
+* Agregar una migración o un índice: el esquema no cambia.
 
 ## What I changed
 
-[COMPLETAR — archivos y qué cambió en cada uno.]
+* `src/modules/requests/requests.service.js` — `getRequest` ahora consulta
+  `canViewRequest` y lanza `notFound(id)` si el requester no es el dueño.
+* `test/request-access-policy.test.js` — 3 pruebas puras reales
+  (agent/owner→true, stranger→false).
+* `test/request-detail.test.js` — 2 regresiones reales (ajeno→404 e
+  `?userId=`→404, ambas con code `REQUEST_NOT_FOUND`).
+* `activities/class-09/activities/class-09/system-dossier.md` — dossier
+  completo (inventario, recorrido, auditoría, impacto).
+* `activities/class-09/activities/class-09/validation-evidence.txt` —
+  salida real del validador final.
+* Baseline previo (commit `class-09-baseline`): mover los documentos a
+  `activities/class-09/activities/class-09/` y quitar las comillas simples
+  del script `test` en `package.json`.
 
 ## How I verified it
 
 Baseline verificado con: `npm run doctor` (7/7), `npm run db:migrate`
 (001-005 SKIPPED), `npm run db:seed` (Seed completed successfully) y
-`npm test` (64 pruebas: 59 pass, 5 todo, 0 fail). Detalle en la tabla y en
-los bloques de arriba.
+`npm test` (64 pruebas: 59 pass, 5 todo, 0 fail).
 
-[COMPLETAR — pruebas, validator, comandos y sus resultados reales para el fix.]
+Fix verificado con, en este orden:
+
+* `npm run test:detail` ANTES del fix → rojo (2 fallos `200 !== 404`).
+* `npm run test:detail` DESPUÉS del fix → verde.
+* `npm run test:policy` → 8/8 (las policies no dependen de Express/DB).
+* `npm test` → 64 pruebas: 64 pass, 0 fail, 0 todo.
+* `npm run validate:class-09` → `FINAL RESULT: PASSED` (14/14).
+* Reproducción manual: owner `200`, ajeno `404`, sin token `401`.
 
 ## What I still cannot explain
 
-[COMPLETAR — honesto. Alimenta la sección 9 del dossier.]
+* Por qué `getRequest` quedó sin el chequeo mientras `getHistory` sí lo
+  tiene; el `TEMP(REQ-442)` sugiere deuda, pero no hay ticket visible.
+* Cómo se comportaría el `claim` con dos agentes concurrentes (no hay
+  prueba de concurrencia; `withTransaction` no bloquea la fila).
+* Si el `userId` que se registra en el log operativo debería ser opaco.
