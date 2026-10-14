@@ -55,6 +55,29 @@ validador. **Resolución (script):** quité las comillas simples del script
 `test` de `package.json` para que el glob funcione igual en cmd y en sh.
 Con eso el validador pasa [13/14] y `npm test` corre las 64 pruebas.
 
+## Análisis de BUG-901 (antes de tocar código)
+
+Reproducción con usuarios y una solicitud sintéticas (registrados por la
+API, limpiados al terminar). Ejecutando la app en memoria contra la base
+real, ANTES de cambiar nada:
+
+```text
+request id            : 316
+owner    GET /:id     : 200
+stranger GET /:id     : 200   (bug: debería ser 404)
+no token GET /:id     : 401
+stranger GET ?userId= : 200   (bug: debería ser 404)
+stranger body.createdBy: <uuid del owner>   (dueño ajeno expuesto)
+```
+
+Recorrido y causa raíz quedaron en el dossier (secciones 3, 7 y 8):
+`getRequest` (`src/modules/requests/requests.service.js:86-93`) devuelve
+la fila mapeada SIN llamar a `canViewRequest`, mientras `getHistory`
+(`:224`) y `patchRequest` (`:162`) sí la consultan. La regla
+(`src/modules/requests/request.policy.js:20-23`) es correcta; el problema
+es quién la consulta. Análisis de impacto completo en la sección 8 del
+dossier, commiteado como `class-09-analysis` ANTES del fix.
+
 ## What I observed before asking AI
 
 [COMPLETAR — qué habías leído/ejecutado tú antes de preguntar.]
