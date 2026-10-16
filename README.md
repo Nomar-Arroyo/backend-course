@@ -29,6 +29,7 @@ evidencia reproducible, explicación conceptual, sección `AI usage` y reflexió
 | [06](activities/class-06/) | Primer ticket en backend existente | Onboarding con IA: BUG-106 (404 en colección filtrada vacía) y FEATURE-206 (`GET /requests/:id/history`), validador 12/12 | `class-06-submission` |
 | [07](activities/class-07/) | Cuando el backend falla | REPL → testes: INC-701 (id inválido 400), INC-702 (prioridad inválida 400), OPS-703 (requestId + error handler central + `/health` y `/ready`), 38 pruebas y validador 12/12 | `class-07-submission` |
 | [08](activities/class-08/) | Refactoring y responsabilidades | Refactor seguro de `GET /:id/history` por capas + FEATURE-801 (`POST /requests/:id/claim`) con transacción y evento `request_claimed`, mapa de responsabilidades, suite 52/0/0, validador 12/12 y checkpoint acumulativo 1-7 con IA | `class-08-submission` |
+| [09](activities/class-09/) | Entrar, entender y cambiar sin romper | Fase A (evaluación conversacional) + taller en un backend heredado: dossier del sistema (inventario, recorrido de `GET /requests/:id`, auditoría y análisis de impacto), BUG-901 (IDOR: un `requester` leía solicitudes ajenas) reproducido/analizado/corregido en `getRequest` con la policy, regresión rojo→verde, suite 64/64, validador 14/14 | `class-09-submission` |
 
 ## Instrucciones de ejecución
 
@@ -198,6 +199,35 @@ solo agente, request `open` y sin asignar, transacción con evento
 (suite 52/52). Commits: `class-08-baseline`, `class-08-refactor`,
 `class-08-feature`, `class-08-submission`. Tag final: `class-08-submission`.
 
+### Clase 09 — entrar, entender y cambiar sin romper
+
+```bash
+cd activities/class-09
+npm install
+copy .env.example .env   # pegar DATABASE_URL (Supabase, Session pooler) + JWT_SECRET (mismos desde la clase 06)
+npm run doctor            # 7/7 checks del entorno
+npm run db:migrate        # idempotente; 001-005 SKIPPED
+npm run db:seed           # 2 requesters + 1 agent + 6 requests + 15 history events
+npm test                  # suite completa: 64 pass / 0 fail / 0 todo
+npm run validate:class-09 # debe terminar FINAL RESULT: PASSED (14/14)
+npm start
+```
+
+Dos fases. **Fase A (evaluación conversacional):**
+`npm run assessment:prepare -- --student=TU_CORREO` genera la tarjeta; el
+historial y el reporte se validan con `npm run assessment:validate`.
+**Fase B (taller):** repositorio heredado con BUG-901 (un `requester` podía
+leer solicitudes de otros cambiando el id en `GET /requests/:id`). Entregado:
+`system-dossier.md` (inventario de 16 componentes, recorrido de
+`GET /requests/:id`, auditoría de 15 prácticas y análisis de impacto),
+BUG-901 reproducido (ajeno → `200` antes, `404` después), corrección mínima
+en `getRequest` de `src/modules/requests/requests.service.js` consultando
+`canViewRequest` (la regla ya existía; solo no se consultaba en el detalle),
+y regresiones rojo→verde (los 5 `todo` convertidos en pruebas). Los
+documentos por clase viven en `activities/class-09/activities/class-09/`.
+Commits: `class-09-assessment`, `class-09-baseline`, `class-09-analysis`,
+`class-09-fix`, `class-09-submission`. Tag final: `class-09-submission`.
+
 ## Estado de las entregas
 
 | Entrega | Estatus | Observaciones |
@@ -211,6 +241,7 @@ solo agente, request `open` y sin asignar, transacción con evento
 | 06 · Primer ticket en backend existente | ✅   Entregada   | Tag `class-06-submission`; BUG-106 + FEATURE-206; validador PASSED 12/12 en Supabase nueva |
 | 07 · Cuando el backend falla | ✅   Entregada   | Tag `class-07-submission`; INC-701 + INC-702 + OPS-703; validador PASSED 12/12; 38 pruebas de regresión |
 | 08 · Refactoring y responsabilidades | ✅   Entregada   | Tag `class-08-submission`; refactor de `GET /:id/history` + FEATURE-801 (claim); 52/52 pruebas; validador PASSED 12/12; checkpoint acumulativo 1-7 con IA (evidencia + autoevaluación + examen) |
+| 09 · Entrar, entender y cambiar sin romper | ✅   Entregada   | Tag `class-09-submission`; Fase A (evaluación conversacional: historial + reporte, `VALID_INCOMPLETE` como punto de partida si el reporte marcó dimensiones `X`) + taller: dossier del sistema, BUG-901 reproducido/analizado/corregido (policy consultada en `getRequest`), 64/64 pruebas, validador PASSED 14/14 |
 
 ## Reglas del curso que se respetan aquí
 
