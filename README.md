@@ -250,3 +250,9 @@ Commits: `class-09-assessment`, `class-09-baseline`, `class-09-analysis`,
 - La IA puede proponer, pero nunca decide en silencio ni sustituye la comprensión: cada
   carpeta documenta qué se aceptó, qué se rechazó y cómo se verificó (`AI usage`).
 - No se reescribe el historial ni se usa `force push`.
+  - **Excepción acordada (clase 09):** los 5 commits de la entrega 09 se
+    reescribieron con `--force-with-lease` únicamente para corregir la
+    autoría a **Nomar Arroyo** (tenían autor de otra identidad). El
+    contenido quedó idéntico: el `tree` hash de cada commit es el mismo que
+    el de su versión original, y ningún documento referenciaba los hashes
+    reescritos.
